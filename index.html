@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="静态方案与交互说明导航：Protenix + PXDesign 的运行流程、硬件配置与并行条件。">
+    <title>try_test · 静态方案导航</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page: #f5f6f8;
+        --panel: #fff;
+        --text: #182331;
+        --muted: #5d6c7c;
+        --line: #dce3ea;
+        --accent: #1558b0;
+        --tint: #edf4ff;
+        --head: #f8fafc;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      a { color: var(--accent); text-underline-offset: 4px; }
+      a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; border-radius: 3px; }
+      .wrap { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
+      header { padding: 48px 0 30px; }
+      .topline { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .brand { font-size: 14px; font-weight: 700; letter-spacing: .08em; }
+      .repo { font-size: 13px; }
+      h1 { margin: 28px 0 10px; font-size: clamp(27px, 4vw, 36px); line-height: 1.35; letter-spacing: -.03em; }
+      .intro { margin: 0; color: var(--muted); max-width: 760px; }
+      .category { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 8px 0 14px; }
+      h2 { margin: 0; font-size: 19px; }
+      .count { color: var(--muted); font-size: 13px; white-space: nowrap; }
+      .table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+      table { width: 100%; min-width: 790px; border-collapse: collapse; text-align: left; }
+      caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+      th { padding: 14px 20px; background: var(--head); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+      td { padding: 23px 20px; border-top: 1px solid var(--line); vertical-align: top; }
+      .topic { width: 19%; }
+      .page { width: 34%; }
+      .scope { width: 27%; }
+      .date { width: 11%; white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+      .entry { width: 9%; white-space: nowrap; }
+      .tool { display: block; font-weight: 650; line-height: 1.5; }
+      .badge { display: inline-block; margin-top: 9px; padding: 2px 8px; border-radius: 5px; background: var(--tint); color: var(--accent); font-size: 11px; }
+      .page-title { margin: 0; font-size: 15px; line-height: 1.65; font-weight: 650; }
+      .sub { margin: 7px 0 0; font-size: 13px; color: var(--muted); }
+      .scope p { margin: 0 0 5px; font-size: 13px; }
+      .open { display: inline-block; padding: 7px 13px; border: 1px solid var(--accent); border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+      .open:hover { background: var(--tint); }
+      .note { margin: 15px 2px 0; color: var(--muted); font-size: 12px; }
+      footer { display: flex; justify-content: space-between; gap: 16px; padding: 30px 0 42px; color: var(--muted); font-size: 12px; }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --page: #111820;
+          --panel: #19232e;
+          --text: #e5ecf4;
+          --muted: #a0b1c3;
+          --line: #334253;
+          --accent: #93bcff;
+          --tint: #223953;
+          --head: #1c2936;
+        }
+      }
+      @media (max-width: 640px) {
+        .wrap { width: calc(100% - 32px); }
+        header { padding: 26px 0 24px; }
+        h1 { margin-top: 24px; }
+        .intro { font-size: 14px; }
+        .table-wrap { border-radius: 8px; }
+        th, td { padding-left: 16px; padding-right: 16px; }
+        footer { flex-direction: column; gap: 5px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="wrap">
+      <div class="topline">
+        <span class="brand">try_test</span>
+        <a class="repo" href="https://github.com/0xYeah/try_test">GitHub 仓库 ↗</a>
+      </div>
+      <h1>静态方案导航</h1>
+      <p class="intro">按类别查找方案、配置对照和交互说明。打开页面后，可调整条件，查看对应的运行情况。</p>
+    </header>
+    <main class="wrap">
+      <section aria-labelledby="biocomputing-title">
+        <div class="category">
+          <h2 id="biocomputing-title">生物计算</h2>
+          <span class="count">1 个页面</span>
+        </div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="生物计算方案导航；窄屏可左右滑动">
+          <table>
+            <caption>生物计算方案导航</caption>
+            <thead>
+              <tr>
+                <th scope="col">工具 / 专题</th>
+                <th scope="col">页面与用途</th>
+                <th scope="col">覆盖内容</th>
+                <th scope="col">更新日期</th>
+                <th scope="col">查看</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="topic">
+                  <span class="tool">Protenix + PXDesign</span>
+                  <span class="badge">硬件与方案选择</span>
+                </td>
+                <td class="page">
+                  <p class="page-title">基于 protenix 的 运行流程及相关硬件联动需求</p>
+                  <p class="sub">研发调试 / 小批量内测：选择整机配置，理解各阶段如何共同使用硬件。</p>
+                </td>
+                <td class="scope">
+                  <p>GPU、内存、硬盘的占用与联动</p>
+                  <p>单卡能并行哪些步骤、哪些需要等待</p>
+                  <p>双卡并行条件与完整配置单</p>
+                </td>
+                <td class="date"><time datetime="2026-10-15">2026-10-15</time></td>
+                <td class="entry"><a class="open" href="biocomputing/protenix-pxdesign/runtime-hardware.html">打开方案 →</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">页面中的资源数值用于方案估算；实际可运行的输入规模和并发量，需在所选整机上验证。</p>
+      </section>
+    </main>
+    <footer class="wrap">
+      <span>静态页面 · 无需安装 · 浏览器直接查看</span>
+      <a href="https://github.com/0xYeah/try_test#readme">页面维护说明</a>
+    </footer>
+  </body>
+</html>
