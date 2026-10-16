@@ -1797,53 +1797,55 @@ html&gt;body{padding:0}&lt;/style&gt;
 &lt;/style&gt;
 &lt;h2&gt;基于 protenix 的 运行流程及相关硬件联动需求&lt;/h2&gt;
 &lt;div class=&quot;intro&quot;&gt;
- &lt;p&gt;&lt;strong&gt;先按能租到的双卡各 48 GB＋整机 128 GB 内存做小样例试跑。&lt;/strong&gt;单卡 PRO 5000／6000 也能作为调试候选，两套模型轮流用卡。&lt;/p&gt;
+ &lt;p&gt;&lt;strong&gt;分别能跑通，与两个任务能同时跑，是两项验收。&lt;/strong&gt;单张 96 GB 也可尝试两工具共享 GPU；不是卡数为一就必须挨个跑。&lt;/p&gt;
  &lt;p class=&quot;muted&quot;&gt;以下是运行安排，未读取服务器；显存显示卡容量，模型实际占用尚未测量。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;controls&quot;&gt;
  &lt;label for=&quot;pc-model&quot;&gt;按租赁实物选择显卡&lt;select id=&quot;pc-model&quot;&gt;&lt;option value=&quot;unknown48&quot;&gt;48 GB 卡，具体型号待确认&lt;/option&gt;&lt;option value=&quot;ada48&quot;&gt;RTX 6000 Ada · 48 GB&lt;/option&gt;&lt;option value=&quot;l2048&quot;&gt;L20 · 48 GB&lt;/option&gt;&lt;option value=&quot;pro500048&quot;&gt;RTX PRO 5000 Blackwell · 48 GB&lt;/option&gt;&lt;option value=&quot;pro500072&quot;&gt;RTX PRO 5000 Blackwell · 72 GB&lt;/option&gt;&lt;option value=&quot;pro600096&quot;&gt;RTX PRO 6000 Blackwell · 96 GB&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
- &lt;label for=&quot;pc-layout&quot;&gt;实际租到的卡数与机器&lt;select id=&quot;pc-layout&quot;&gt;&lt;option value=&quot;dual&quot;&gt;一台双卡，各用一张&lt;/option&gt;&lt;option value=&quot;single&quot;&gt;一台单卡，两工具轮流&lt;/option&gt;&lt;option value=&quot;split&quot;&gt;两台机器，各一张卡&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+ &lt;label for=&quot;pc-layout&quot;&gt;卡数与运行方式&lt;select id=&quot;pc-layout&quot;&gt;&lt;option value=&quot;dual&quot;&gt;一台双卡，各用一张&lt;/option&gt;&lt;option value=&quot;single&quot;&gt;一台单卡，两任务共享 GPU&lt;/option&gt;&lt;option value=&quot;queue&quot;&gt;一台单卡，主动排队运行&lt;/option&gt;&lt;option value=&quot;split&quot;&gt;两台机器，各一张卡&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
  &lt;label for=&quot;pc-ram&quot;&gt;&lt;span id=&quot;pc-ram-label&quot;&gt;整机内存&lt;/span&gt;&lt;select id=&quot;pc-ram&quot;&gt;&lt;option value=&quot;128&quot;&gt;128 GB&lt;/option&gt;&lt;option value=&quot;256&quot;&gt;256 GB（租得到时再选）&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
- &lt;label for=&quot;pc-relation&quot;&gt;现在要做的任务&lt;select id=&quot;pc-relation&quot;&gt;&lt;option value=&quot;cross&quot;&gt;甲预测＋已准备好的乙设计&lt;/option&gt;&lt;option value=&quot;new&quot;&gt;同一新项目，从目标序列开始&lt;/option&gt;&lt;option value=&quot;known&quot;&gt;已有确认结构，直接设计&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
- &lt;label for=&quot;pc-condition&quot; id=&quot;pc-condition-label&quot; class=&quot;control-wide&quot;&gt;查看双任务试跑时的情况&lt;select id=&quot;pc-condition&quot;&gt;&lt;option value=&quot;untested&quot;&gt;尚未实测：先尝试分卡重叠&lt;/option&gt;&lt;option value=&quot;fit&quot;&gt;试跑通过时：两任务有足够内存&lt;/option&gt;&lt;option value=&quot;pressure&quot;&gt;内存吃紧时：后启动的设计等待&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+ &lt;label for=&quot;pc-relation&quot;&gt;现在要做的任务&lt;select id=&quot;pc-relation&quot;&gt;&lt;option value=&quot;cross&quot;&gt;输入各自就绪：一项预测＋一项设计&lt;/option&gt;&lt;option value=&quot;new&quot;&gt;同一新项目，从目标序列开始&lt;/option&gt;&lt;option value=&quot;known&quot;&gt;已有确认结构，直接设计&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+ &lt;label for=&quot;pc-condition&quot; id=&quot;pc-condition-label&quot; class=&quot;control-wide&quot;&gt;查看两任务同时试跑的情况&lt;select id=&quot;pc-condition&quot;&gt;&lt;option value=&quot;untested&quot;&gt;尚未实测：先尝试两任务重叠&lt;/option&gt;&lt;option value=&quot;fit&quot;&gt;试跑满足时：显存与内存都有余量&lt;/option&gt;&lt;option value=&quot;vram&quot;&gt;同卡显存不足时：设计等待&lt;/option&gt;&lt;option value=&quot;pressure&quot;&gt;内存吃紧时：后启动的设计等待&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
  &lt;label for=&quot;pc-stage&quot; id=&quot;pc-stage-label&quot; class=&quot;control-wide&quot; hidden&gt;这个项目进行到哪一步&lt;select id=&quot;pc-stage&quot;&gt;&lt;option value=&quot;predicting&quot;&gt;正在预测，结构还没出来&lt;/option&gt;&lt;option value=&quot;handoff&quot;&gt;预测已结束，结构文件尚未核验交接&lt;/option&gt;&lt;option value=&quot;review&quot;&gt;结构已就绪，设计区域尚未确认&lt;/option&gt;&lt;option value=&quot;ready&quot;&gt;结构文件与设计条件全部就绪&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
 &lt;/div&gt;
 &lt;div id=&quot;pc-plan-result&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
 &lt;div class=&quot;versions&quot;&gt;
  &lt;h3&gt;起测只跑这一小批&lt;/h3&gt;
  &lt;p&gt;Protenix：&lt;code&gt;protenix_base_default_v1.0.0&lt;/code&gt;，先跑官方 693 残基样例。PXDesign：生成器 v0.1.0、内部 Protenix v0.5.0+pxd；官方 PD-L1 样例（116 残基目标＋80 残基设计链），完整模式先生成 10 个骨架，再做序列设计和内部筛选。&lt;/p&gt;
- &lt;p class=&quot;muted&quot;&gt;先单项跑通，再让两个不同项目重叠。10 是申请生成数，合格候选按实际筛选结果交付；只跑生成器不算完整通过。&lt;/p&gt;
+ &lt;p class=&quot;muted&quot;&gt;分别跑通：两工具各自交出完整结果。同时跑通：重叠期间两任务都有进展，最终都完成，覆盖 PXDesign 内部筛选；不能只看两个进程已启动。两项验收当前均未实测。&lt;/p&gt;
 &lt;/div&gt;
-&lt;p class=&quot;sources&quot;&gt;依据：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/README.md#running-pxdesign&quot;&gt;PXDesign 固定版本与调试说明&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/Protenix/blob/85767b811c40ed46e73a9b39519cf6bfca8701ba/examples/input.json&quot;&gt;Protenix 固定样例&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/&quot;&gt;PRO 5000 规格&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/&quot;&gt;PRO 6000 规格&lt;/a&gt;&lt;/p&gt;
+&lt;p class=&quot;sources&quot;&gt;依据：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/README.md#running-pxdesign&quot;&gt;PXDesign 固定版本与调试说明&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/Protenix/blob/85767b811c40ed46e73a9b39519cf6bfca8701ba/examples/input.json&quot;&gt;Protenix 固定样例&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/&quot;&gt;PRO 5000 规格&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/&quot;&gt;PRO 6000 规格&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://docs.nvidia.com/deploy/nvidia-smi/index.html#compute-mode&quot;&gt;单卡多进程规则&lt;/a&gt;&lt;/p&gt;
 &lt;script&gt;
 (()=&gt;{
 const root=document.getElementById(&#x27;px-product-concurrency&#x27;),$=s=&gt;root.querySelector(s);
 const models={unknown48:{name:&#x27;48 GB 卡（型号待确认）&#x27;,gb:48,unknown:true},ada48:{name:&#x27;RTX 6000 Ada&#x27;,gb:48},l2048:{name:&#x27;L20&#x27;,gb:48},pro500048:{name:&#x27;RTX PRO 5000 Blackwell&#x27;,gb:48,blackwell:true},pro500072:{name:&#x27;RTX PRO 5000 Blackwell&#x27;,gb:72,blackwell:true},pro600096:{name:&#x27;RTX PRO 6000 Blackwell&#x27;,gb:96,blackwell:true}};
-const layouts=[&#x27;dual&#x27;,&#x27;single&#x27;,&#x27;split&#x27;],relations=[&#x27;cross&#x27;,&#x27;new&#x27;,&#x27;known&#x27;],stages=[&#x27;predicting&#x27;,&#x27;handoff&#x27;,&#x27;review&#x27;,&#x27;ready&#x27;],conditions=[&#x27;untested&#x27;,&#x27;fit&#x27;,&#x27;pressure&#x27;];
+const layouts=[&#x27;dual&#x27;,&#x27;single&#x27;,&#x27;queue&#x27;,&#x27;split&#x27;],relations=[&#x27;cross&#x27;,&#x27;new&#x27;,&#x27;known&#x27;],stages=[&#x27;predicting&#x27;,&#x27;handoff&#x27;,&#x27;review&#x27;,&#x27;ready&#x27;],conditions=[&#x27;untested&#x27;,&#x27;fit&#x27;,&#x27;vram&#x27;,&#x27;pressure&#x27;];
 let state={model:&#x27;unknown48&#x27;,layout:&#x27;dual&#x27;,ram:128,relation:&#x27;cross&#x27;,stage:&#x27;predicting&#x27;,condition:&#x27;untested&#x27;};
 const esc=s=&gt;String(s).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,c=&gt;({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#39;&#x27;}[c]));
 function planView(s=state){
- const m=models[s.model],cross=s.relation===&#x27;cross&#x27;,single=s.layout===&#x27;single&#x27;,split=s.layout===&#x27;split&#x27;;
+ const m=models[s.model],cross=s.relation===&#x27;cross&#x27;,single=[&#x27;single&#x27;,&#x27;queue&#x27;].includes(s.layout),sharing=s.layout===&#x27;single&#x27;,queue=s.layout===&#x27;queue&#x27;,split=s.layout===&#x27;split&#x27;;
  const ptx=cross||s.relation===&#x27;new&#x27;&amp;&amp;s.stage===&#x27;predicting&#x27;;
  const inputReady=cross||s.relation===&#x27;known&#x27;||s.stage===&#x27;ready&#x27;;
  let px=inputReady,reason=&#x27;&#x27;,status=&#x27;安排设计&#x27;;
  if(!inputReady){px=false;status=&#x27;等上一步&#x27;;reason={predicting:&#x27;等本项目的预测结构；多一张卡也不能跳过。&#x27;,handoff:&#x27;预测结束不等于输入就绪；先核验并交接结构文件。&#x27;,review:&#x27;先确认使用哪条链、设计区域和相应序列资料。&#x27;}[s.stage];}
- else if(single&amp;&amp;ptx){px=false;status=&#x27;等显卡&#x27;;reason=&#x27;本方案一张卡一次一个模型重任务；预测模型退出后再设计。&#x27;;}
- else if(cross&amp;&amp;!single&amp;&amp;!split&amp;&amp;s.condition===&#x27;pressure&#x27;){px=false;status=&#x27;等内存&#x27;;reason=&#x27;保留先启动的预测；后启动的设计等待。另一张卡空闲也不能替代内存。&#x27;;}
+ else if(queue&amp;&amp;ptx){px=false;status=&#x27;主动排队&#x27;;reason=&#x27;选择了一次只启动一个重任务；这是运行策略，不是单卡的硬限制。&#x27;;}
+ else if(cross&amp;&amp;sharing&amp;&amp;s.condition===&#x27;vram&#x27;){px=false;status=&#x27;等显存&#x27;;reason=&#x27;两个完整流程的重叠显存放不下本卡；减小负载或等前一任务释放，不能给两工具各算一整张卡。&#x27;;}
+ else if(cross&amp;&amp;!split&amp;&amp;s.condition===&#x27;pressure&#x27;){px=false;status=&#x27;等内存&#x27;;reason=&#x27;保留先启动的预测；后启动的设计等待。空余显存不能替代整机内存。&#x27;;}
  const overlap=ptx&amp;&amp;px;
- let headline=overlap?(s.condition===&#x27;fit&#x27;?&#x27;按所选试跑条件：两项计算可重叠&#x27;:&#x27;两张卡可分工；完整并发能否完成，先试跑确认&#x27;):px?&#x27;设计输入就绪，安排 PXDesign&#x27;:ptx?&#x27;先做预测，设计按原因等待&#x27;:&#x27;预测已退出，设计仍在等输入&#x27;;
+ let headline=overlap?(s.condition===&#x27;fit&#x27;?&#x27;按所选资源条件：两个任务可同时推进&#x27;:sharing?&#x27;同一张卡可共享；这个负载能否同时完成，须实测&#x27;:&#x27;两张卡可分工；完整并发能否完成，先试跑确认&#x27;):px?&#x27;设计输入就绪，安排 PXDesign&#x27;:ptx?&#x27;先做预测，设计按原因等待&#x27;:&#x27;预测已退出，设计仍在等输入&#x27;;
  if(overlap&amp;&amp;split)headline=&#x27;两机可以分别计算；本机资源各自检查&#x27;;
  const pGpu=split?&#x27;机器 A · GPU 0&#x27;:single?&#x27;GPU 0&#x27;:&#x27;物理 GPU 1&#x27;;
- const xGpu=split?&#x27;机器 B · GPU 0&#x27;:&#x27;物理 GPU 0&#x27;;
+ const xGpu=split?&#x27;机器 B · GPU 0&#x27;:single?&#x27;GPU 0&#x27;:&#x27;物理 GPU 0&#x27;;
  const memory=split?&#x27;每台 &#x27;+s.ram+&#x27; GB，分别使用；不能借另一台的空余内存。&#x27;:&#x27;整机 &#x27;+s.ram+&#x27; GB，两模型、子进程、系统和准备工作共用。&#x27;;
- return{m,cross,single,split,ptx,px,inputReady,overlap,reason,status,headline,pGpu,xGpu,memory};
+ return{m,cross,single,sharing,queue,split,ptx,px,inputReady,overlap,reason,status,headline,pGpu,xGpu,memory};
 }
 function restore(saved){
  const s=saved&amp;&amp;saved.modelContent;
- if(!s||s.visualization!==&#x27;protenix-rental-workflow&#x27;||s.revision!==6)return;
+ if(!s||s.visualization!==&#x27;protenix-rental-workflow&#x27;||s.revision!==7)return;
  if(Object.hasOwn(models,s.model))state.model=s.model;
  for(const[k,values]of Object.entries({layout:layouts,relation:relations,stage:stages,condition:conditions}))if(values.includes(s[k]))state[k]=s[k];
  if([128,256].includes(s.ram))state.ram=s.ram;
+ if(state.condition===&#x27;vram&#x27;&amp;&amp;state.layout!==&#x27;single&#x27;)state.condition=&#x27;untested&#x27;;
 }
 function update(key,value){
  if(key===&#x27;ram&#x27;)value=Number(value);
@@ -1856,25 +1858,28 @@ function render(save=false){
  const v=planView(),s=state;
  for(const key of [&#x27;model&#x27;,&#x27;layout&#x27;,&#x27;ram&#x27;,&#x27;relation&#x27;,&#x27;stage&#x27;,&#x27;condition&#x27;])$(&#x27;#pc-&#x27;+key).value=String(s[key]);
  $(&#x27;#pc-stage-label&#x27;).hidden=s.relation!==&#x27;new&#x27;;
- $(&#x27;#pc-condition-label&#x27;).hidden=!(v.cross&amp;&amp;!v.single&amp;&amp;!v.split);
+ $(&#x27;#pc-condition-label&#x27;).hidden=!(v.cross&amp;&amp;!v.queue&amp;&amp;!v.split);
+ $(&#x27;#pc-condition option[value=&quot;vram&quot;]&#x27;).hidden=!v.sharing;
+ $(&#x27;#pc-condition option[value=&quot;vram&quot;]&#x27;).disabled=!v.sharing;
  $(&#x27;#pc-ram-label&#x27;).textContent=v.split?&#x27;每台内存（分别核算）&#x27;:&#x27;整机内存&#x27;;
- const config=s.layout===&#x27;single&#x27;?&#x27;1 张 &#x27;+v.m.gb+&#x27; GB 卡&#x27;:s.layout===&#x27;dual&#x27;?&#x27;同机 2 张卡，各 &#x27;+v.m.gb+&#x27; GB&#x27;:&#x27;两台机器，每台 1 张 &#x27;+v.m.gb+&#x27; GB 卡&#x27;;
+ const config=v.single?&#x27;1 张 &#x27;+v.m.gb+&#x27; GB 卡&#x27;:s.layout===&#x27;dual&#x27;?&#x27;同机 2 张卡，各 &#x27;+v.m.gb+&#x27; GB&#x27;:&#x27;两台机器，每台 1 张 &#x27;+v.m.gb+&#x27; GB 卡&#x27;;
  const row=(name,status,reason,gpu,blocked,ready)=&gt;&#x27;&lt;tr class=&quot;&#x27;+(blocked?&#x27;wait&#x27;:&#x27;&#x27;)+&#x27;&quot; data-job=&quot;&#x27;+name+&#x27;&quot; data-blocked=&quot;&#x27;+blocked+&#x27;&quot;&gt;&lt;td class=&quot;job-name&quot;&gt;&#x27;+esc(name)+&#x27;&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;status &#x27;+(ready?&#x27;ready&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+esc(status)+&#x27;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;owner&quot;&gt;&#x27;+esc(gpu)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(reason)+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;
- let pReason=v.ptx?(v.cross?&#x27;预测项目甲，与设计项目乙使用不同输入。&#x27;:&#x27;产出本项目目标结构。&#x27;):(s.relation===&#x27;known&#x27;?&#x27;已有确认结构，本次不用重复预测。&#x27;:&#x27;本次预测已退出，继续准备设计输入。&#x27;);
- let xStatus=v.px?(v.overlap?(v.split?&#x27;分机试跑&#x27;:s.condition===&#x27;fit&#x27;?&#x27;按所选条件并行&#x27;:&#x27;分卡试跑，待测&#x27;):&#x27;安排设计&#x27;):v.status;
- let xReason=v.px?&#x27;骨架生成 → 序列设计 → 内部筛选；全部模型进程退出后释放本卡。&#x27;:v.reason;
+ let pReason=v.ptx?(v.cross?&#x27;两任务输入各自就绪，可来自不同项目，也可来自同一项目的不同批次。&#x27;:&#x27;产出本项目目标结构。&#x27;):(s.relation===&#x27;known&#x27;?&#x27;已有确认结构，本次不用重复预测。&#x27;:&#x27;本次预测已退出，继续准备设计输入。&#x27;);
+ let xStatus=v.px?(v.overlap?(v.split?&#x27;分机试跑&#x27;:s.condition===&#x27;fit&#x27;?&#x27;按所选条件并行&#x27;:v.sharing?&#x27;同卡共享试跑&#x27;:&#x27;分卡试跑，待测&#x27;):&#x27;安排设计&#x27;):v.status;
+ let xReason=v.px?&#x27;骨架生成 → 序列设计 → 内部筛选；本任务模型进程退出后释放其占用，同卡其他任务仍可继续。&#x27;:v.reason;
  let html=&#x27;&lt;div class=&quot;configuration&quot;&gt;&lt;strong&gt;&#x27;+esc(config)+&#x27;&lt;/strong&gt; · &#x27;+esc(v.m.name)+&#x27; · &#x27;+(v.split?&#x27;每台 &#x27;:&#x27;整机 &#x27;)+s.ram+&#x27; GB 内存&lt;/div&gt;&lt;p class=&quot;headline&quot;&gt;&#x27;+esc(v.headline)+&#x27;&lt;/p&gt;&#x27;;
  html+=&#x27;&lt;table class=&quot;jobs&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;任务&lt;/th&gt;&lt;th&gt;当前安排&lt;/th&gt;&lt;th&gt;显卡&lt;/th&gt;&lt;th&gt;为什么／下一步&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&#x27;;
  html+=row(&#x27;Protenix&#x27;,v.ptx?&#x27;安排预测&#x27;:&#x27;本次不计算&#x27;,pReason,v.ptx?v.pGpu+&#x27; · &#x27;+v.m.gb+&#x27; GB&#x27;:&#x27;不占 GPU&#x27;,!v.ptx,v.ptx&amp;&amp;!v.overlap);
  html+=row(&#x27;PXDesign&#x27;,xStatus,xReason,v.px?v.xGpu+&#x27; · &#x27;+v.m.gb+&#x27; GB&#x27;:&#x27;未启动，不占 GPU&#x27;,!v.px,v.px&amp;&amp;(!v.overlap||s.condition===&#x27;fit&#x27;));
  html+=&#x27;&lt;/tbody&gt;&lt;/table&gt;&#x27;;
- html+=&#x27;&lt;p class=&quot;muted&quot;&gt;灰色任务当前不启动。&#x27;+(v.single?&#x27;显存更大只增加单任务空间，两模型仍按本方案轮流。&#x27;:v.split?&#x27;同一项目先完成 A 的结构文件与区域确认，再交 B；自动转接尚未实现。&#x27;:&#x27;两卡显存分开，不能合成一个大显存任务。&#x27;)+&#x27;&lt;/p&gt;&#x27;;
+ html+=&#x27;&lt;p class=&quot;muted&quot;&gt;灰色任务当前不启动。&#x27;+(v.queue?&#x27;主动排队是可选策略，不是硬件规定。&#x27;:v.sharing?&#x27;两个进程共用同一张卡的显存和算力，不各占一份完整容量；同时运行不保证各自保持单跑速度。&#x27;:v.split?&#x27;同一项目先完成 A 的结构文件与区域确认，再交 B；自动转接尚未实现。&#x27;:&#x27;两卡显存分开，不能合成一个大显存任务。&#x27;)+&#x27;&lt;/p&gt;&#x27;;
+ if(v.sharing)html+=&#x27;&lt;p&gt;&lt;strong&gt;同卡能否装下：&lt;/strong&gt;独立 Protenix＋PXDesign 生成模型及当前筛选子进程＋缓存与运行开销，重叠时都要放在这 &#x27;+v.m.gb+&#x27; GB 内，并留余量。实际合计峰值待测。&lt;/p&gt;&#x27;;
  html+=&#x27;&lt;div class=&quot;notes&quot;&gt;&lt;div&gt;&lt;h3&gt;内存&lt;/h3&gt;&lt;p&gt;&#x27;+esc(v.memory)+&#x27;&lt;/p&gt;&lt;p&gt;实际峰值待测，不预填每个模型占多少 GB。&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;h3&gt;硬盘&lt;/h3&gt;&lt;p&gt;权重、CCD 和预计算 MSA 读入内存，模型结果再写回盘。先核可用空间，下载、解压和结果留存会叠加占盘。&lt;/p&gt;&lt;p&gt;起测不下载训练集或全量 MSA 库。&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;h3&gt;CPU 阶段&lt;/h3&gt;&lt;p&gt;其他项目的输入准备、结果整理和查看可穿插；内存或磁盘吃紧时也要等。&lt;/p&gt;&lt;p&gt;显卡不忙，不代表整机还有余量。&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
  if(v.m.blackwell)html+=&#x27;&lt;p&gt;&lt;strong&gt;此卡的前置项：&lt;/strong&gt;PXDesign 旧版依赖要做 Blackwell 适配，完整生成与筛选试跑通过后才能接业务。PRO 5000 和 PRO 6000 都有这一项。&lt;/p&gt;&#x27;;
  else if(v.m.unknown)html+=&#x27;&lt;p&gt;&lt;strong&gt;租前还差一项：&lt;/strong&gt;确认这张 48 GB 卡的完整型号；不同代显卡的依赖兼容性不同。&lt;/p&gt;&#x27;;
- else html+=&#x27;&lt;p class=&quot;muted&quot;&gt;&#x27;+(s.model===&#x27;l2048&#x27;?&#x27;官方提供 L20 运行参考，但没有这台 128 GB 整机的完整并发峰值。&#x27;:&#x27;此卡容量有官方规格；完整流程兼容与资源余量仍要按本机验证。&#x27;)+&#x27;&lt;/p&gt;&#x27;;
+ else html+=&#x27;&lt;p class=&quot;muted&quot;&gt;&#x27;+(s.model===&#x27;l2048&#x27;?&#x27;官方提供 L20 运行参考，但没有当前所选整机的完整并发峰值。&#x27;:&#x27;此卡容量有官方规格；完整流程兼容与资源余量仍要按本机验证。&#x27;)+&#x27;&lt;/p&gt;&#x27;;
  $(&#x27;#pc-plan-result&#x27;).innerHTML=html;
- if(save&amp;&amp;window.openai&amp;&amp;typeof window.openai.setWidgetState===&#x27;function&#x27;)window.openai.setWidgetState({modelContent:{visualization:&#x27;protenix-rental-workflow&#x27;,revision:6,...s},privateContent:null}).catch(()=&gt;{});
+ if(save&amp;&amp;window.openai&amp;&amp;typeof window.openai.setWidgetState===&#x27;function&#x27;)window.openai.setWidgetState({modelContent:{visualization:&#x27;protenix-rental-workflow&#x27;,revision:7,...s},privateContent:null}).catch(()=&gt;{});
 }
 for(const key of [&#x27;model&#x27;,&#x27;layout&#x27;,&#x27;ram&#x27;,&#x27;relation&#x27;,&#x27;stage&#x27;,&#x27;condition&#x27;])$(&#x27;#pc-&#x27;+key).addEventListener(&#x27;change&#x27;,e=&gt;{update(key,e.target.value);render(true);});
 restore(window.openai&amp;&amp;window.openai.widgetState);render();
