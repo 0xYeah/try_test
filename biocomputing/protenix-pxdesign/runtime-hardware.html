@@ -1802,15 +1802,67 @@ html&gt;body{padding:0}&lt;/style&gt;
 #px-product-concurrency .ready-row{background:var(--green-fill)}
 #px-product-concurrency option:disabled{color:var(--dim)}
 #px-product-concurrency #pc-workloads table{table-layout:fixed;min-width:760px}#px-product-concurrency #pc-workloads th:nth-child(1){width:12%}#px-product-concurrency #pc-workloads th:nth-child(2){width:25%}#px-product-concurrency #pc-workloads th:nth-child(3){width:40%}#px-product-concurrency #pc-workloads th:nth-child(4){width:23%}
+#px-product-concurrency .plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}#px-product-concurrency .plan-host{padding:12px;background:var(--bg);border-radius:6px;min-width:0}#px-product-concurrency .plan-lane{display:grid;grid-template-columns:160px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}#px-product-concurrency .plan-lane.is-wait{color:var(--dim);background:var(--bg)}#px-product-concurrency .plan-lane p{margin:0}#px-product-concurrency .plan-headline{font-size:16px;font-weight:500;margin:12px 0 4px}#px-product-concurrency .plan-steps{display:flex;flex-wrap:wrap;gap:6px 16px;padding:0;list-style:none;margin:12px 0}#px-product-concurrency .plan-steps li{padding:6px 0}#px-product-concurrency .plan-steps li.is-wait{color:var(--dim)}#px-product-concurrency .quick-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}#px-product-concurrency :focus-visible{outline:2px solid var(--blue);outline-offset:3px}#px-product-concurrency .config-table{min-width:680px}#px-product-concurrency .plan-grid[hidden],#px-product-concurrency [hidden]{display:none}
+@media(max-width:650px){#px-product-concurrency .plan-grid{grid-template-columns:minmax(0,1fr)}#px-product-concurrency .plan-lane{grid-template-columns:minmax(0,1fr);gap:4px}#px-product-concurrency #pc-planner .controls&gt;label{flex:1 1 100%}}
 &lt;/style&gt;
 &lt;div class=&quot;window&quot;&gt;
 &lt;header&gt;
- &lt;div class=&quot;note&quot;&gt;Phase I · 独立 Linux · 官方依据与待试跑负载，模型峰值未实测 · 核验日期 2026-10-15&lt;/div&gt;
+ &lt;div class=&quot;note&quot;&gt;Phase I · Linux 原生交付 · 配置与并发规划，模型峰值尚未实测 · 更新 2026-10-16&lt;/div&gt;
  &lt;h2&gt;基于 protenix 的 运行流程及相关硬件联动需求&lt;/h2&gt;
- &lt;p&gt;同一台机器、不同项目：准备输入、结构预测、候选设计、整理结果、查看下载同时推进。每项计算使用各自已经就绪的输入。&lt;/p&gt;
- &lt;p&gt;&lt;span class=&quot;tag done&quot;&gt;单卡试租候选 · 尚未验收&lt;/span&gt;RTX 6000 Ada 48 GB＋256 GB 内存＋32 物理核＋2 TB 系统盘／4 TB 数据盘。用于调试与小批量内测的试租目标；没有同版本、同输入的实测前，不作为采购定型。&lt;/p&gt;
- &lt;p class=&quot;note&quot;&gt;Protenix 与 PXDesign 的模型计算都用 GPU。单卡默认一次执行一个完整 GPU 任务，另一项排队；CPU 输入准备、结果整理和查看继续并行。单次输入规模与采样配置决定显存需求，小批量不代表单任务一定省显存。&lt;/p&gt;
+ &lt;p&gt;&lt;strong&gt;主推荐双 A100 80 GB＋512 GB 内存；PRO 6000 工作站也保留。&lt;/strong&gt;先看各任务为什么能并行或要等，再看配置依据。所有配置均需用固定输入试租验收。&lt;/p&gt;
+ &lt;p class=&quot;note&quot;&gt;同一个项目要等上游结构和设计条件；不同项目可以分卡或分机计算。单卡按本期一张卡一个重任务排队，不代表 CUDA 绝对不能多进程共享。&lt;/p&gt;
+ &lt;nav class=&quot;quick-links&quot; aria-label=&quot;方案内容&quot;&gt;&lt;a href=&quot;#pc-planner&quot;&gt;选择配置与运行情况&lt;/a&gt;&lt;a href=&quot;#pc-tiers&quot;&gt;三档配置单&lt;/a&gt;&lt;a href=&quot;#pc-pro-workstation&quot;&gt;PRO 6000 工作站&lt;/a&gt;&lt;a href=&quot;#pc-cloud&quot;&gt;双云机衔接&lt;/a&gt;&lt;a href=&quot;#pc-source-details&quot;&gt;模型与依据&lt;/a&gt;&lt;/nav&gt;
 &lt;/header&gt;
+&lt;section class=&quot;panel section&quot; id=&quot;pc-planner&quot;&gt;
+ &lt;h3&gt;先选配置，再看谁能工作、谁在等什么&lt;/h3&gt;
+ &lt;div class=&quot;controls&quot;&gt;
+  &lt;label for=&quot;pc-plan&quot;&gt;配置方案&lt;select id=&quot;pc-plan&quot;&gt;&lt;option value=&quot;tier1&quot;&gt;一档：双 L20，各 48 GB&lt;/option&gt;&lt;option value=&quot;tier2&quot; selected&gt;二档：双 A100，各 80 GB · 主推荐&lt;/option&gt;&lt;option value=&quot;tier3&quot;&gt;三档：双 H200 NVL，各 141 GB&lt;/option&gt;&lt;option value=&quot;cloud&quot;&gt;两台云机：各一张 80 GB GPU&lt;/option&gt;&lt;option value=&quot;pro96dual&quot;&gt;P8 工作站：双 PRO 6000 Max-Q，各 96 GB&lt;/option&gt;&lt;option value=&quot;pro96single&quot;&gt;工作站：单 PRO 6000，96 GB&lt;/option&gt;&lt;option value=&quot;mixed&quot;&gt;工作站：Ada 48 GB＋PRO 6000 96 GB&lt;/option&gt;&lt;option value=&quot;single48&quot;&gt;对照：单 RTX 6000 Ada，48 GB&lt;/option&gt;&lt;option value=&quot;single72&quot;&gt;对照：单 PRO 5000，72 GB&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+  &lt;label for=&quot;pc-relation&quot;&gt;任务之间的关系&lt;select id=&quot;pc-relation&quot;&gt;&lt;option value=&quot;cross&quot;&gt;不同项目：甲预测，乙设计&lt;/option&gt;&lt;option value=&quot;new&quot;&gt;同一新项目：从序列开始&lt;/option&gt;&lt;option value=&quot;known&quot;&gt;已有确认结构：直接设计&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+  &lt;label for=&quot;pc-gate&quot; id=&quot;pc-gate-label&quot; hidden&gt;这个新靶点准备到哪一步&lt;select id=&quot;pc-gate&quot;&gt;&lt;option value=&quot;predicting&quot;&gt;还在预测，结构未出来&lt;/option&gt;&lt;option value=&quot;archive&quot;&gt;预测结束，文件尚未归档核验&lt;/option&gt;&lt;option value=&quot;review&quot;&gt;文件已核验，设计区域尚未确认&lt;/option&gt;&lt;option value=&quot;transfer_failed&quot;&gt;设计条件确认，但下游文件交接校验失败&lt;/option&gt;&lt;option value=&quot;ready&quot;&gt;结构、设计条件及下游文件全部就绪&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+ &lt;/div&gt;
+ &lt;div id=&quot;pc-plan-result&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
+ &lt;p class=&quot;note&quot;&gt;灰色＝当前规划里不启动，原因写在对应任务旁。这里展示依赖与资源隔离安排，不是真实调度状态；“可安排”不等于本项目已经跑通。&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class=&quot;panel section&quot; id=&quot;pc-tiers&quot;&gt;
+ &lt;h3&gt;同机三档：一套工作独占一张卡&lt;/h3&gt;
+ &lt;p class=&quot;note&quot;&gt;CPU、内存和磁盘均为工程容量建议，非官方最低值或实际占用。两卡显存不能合并给单个任务。点选上方方案可看具体资源归属。&lt;/p&gt;
+ &lt;div class=&quot;table-wrap&quot;&gt;&lt;table class=&quot;config-table&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;配置项&lt;/th&gt;&lt;th&gt;一档 · 小规模试租&lt;/th&gt;&lt;th&gt;二档 · 主推荐&lt;/th&gt;&lt;th&gt;三档 · 扩展预留&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+ &lt;tr&gt;&lt;td&gt;GPU&lt;/td&gt;&lt;td&gt;2×L20，各 48 GB&lt;/td&gt;&lt;td&gt;&lt;strong&gt;2×A100 PCIe，各 80 GB&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;2×H200 NVL，各 141 GB&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;CPU&lt;/td&gt;&lt;td&gt;共 32 物理核&lt;/td&gt;&lt;td&gt;共 64 物理核&lt;/td&gt;&lt;td&gt;共 64 物理核起&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;内存&lt;/td&gt;&lt;td&gt;256 GB ECC RDIMM&lt;/td&gt;&lt;td&gt;&lt;strong&gt;512 GB ECC RDIMM&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;1 TB ECC RDIMM&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;系统盘&lt;/td&gt;&lt;td&gt;2 TB NVMe&lt;/td&gt;&lt;td&gt;2 TB NVMe&lt;/td&gt;&lt;td&gt;2 TB NVMe&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;数据与临时盘&lt;/td&gt;&lt;td&gt;4 TB NVMe&lt;/td&gt;&lt;td&gt;2×3.84 TB 企业级 NVMe，资料与任务分盘&lt;/td&gt;&lt;td&gt;2×7.68 TB 企业级 NVMe，资料与任务分盘&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;整机配套&lt;/td&gt;&lt;td colspan=&quot;3&quot;&gt;原厂双卡服务器、10 GbE、匹配的插槽与线束、持续满载供电及风道、UPS 安全关机、独立结果备份。主板、冗余电源及具体组合由整机厂按完整物料单确认；SXM 模块不是普通 PCIe 卡。&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;选型依据&lt;/td&gt;&lt;td&gt;官方有 L20 完整流程耗时参考，峰值未知；先测小样例&lt;/td&gt;&lt;td&gt;A100 是 PXDesign 官方推荐架构；80 GB 留容量余量，非完整并发实测&lt;/td&gt;&lt;td&gt;141 GB 是官方卡容量；无本项目 H200 完整流程实测&lt;/td&gt;&lt;/tr&gt;
+ &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+ &lt;p class=&quot;note&quot;&gt;来源：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/README.md#running-pxdesign&quot;&gt;PXDesign 推荐架构与 L20 参考&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-gb/data-center/a100/&quot;&gt;A100 80 GB 规格&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-eu/data-center/h200/&quot;&gt;H200 NVL 规格&lt;/a&gt;。A100 PCIe 每卡 300 W、H200 NVL 最高 600 W，不能仅用 GPU 功耗相加选整机电源。&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class=&quot;panel section&quot; id=&quot;pc-pro-workstation&quot;&gt;
+ &lt;h3&gt;之前的 PRO 6000 工作站：可以保留，需要选对版本&lt;/h3&gt;
+ &lt;p&gt;&lt;strong&gt;问题是旧软件栈的适配尚未验收，不是工作站硬件不够。&lt;/strong&gt;单卡 96 GB 保留为排队方案；双卡 96 GB 可让两项工作各用一张卡，完成 Blackwell 全流程适配后再确认承载。&lt;/p&gt;
+ &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;准确型号&lt;/th&gt;&lt;th&gt;显存／功耗&lt;/th&gt;&lt;th&gt;联想 P8 官方平台支持&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+ &lt;tr&gt;&lt;td&gt;RTX 6000 Ada Generation&lt;/td&gt;&lt;td&gt;48 GB／300 W&lt;/td&gt;&lt;td&gt;最多三张，和 Blackwell PRO 6000 是不同产品&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;RTX PRO 6000 Blackwell Workstation&lt;/td&gt;&lt;td&gt;96 GB／600 W&lt;/td&gt;&lt;td&gt;最多一张，不能写成 P8 双卡配置&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;strong&gt;RTX PRO 6000 Blackwell Max-Q Workstation&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;&lt;strong&gt;96 GB／300 W&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;&lt;strong&gt;最多三张；本方案询配两张&lt;/strong&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+ &lt;p&gt;&lt;strong&gt;P8 双卡询价单：&lt;/strong&gt;Threadripper PRO 9975WX（32 核）或 9985WX（64 核）；512 GB ECC RDIMM（8×64 GB）；2×PRO 6000 Max-Q 96 GB；2 TB 系统 NVMe＋2×4 TB 数据 NVMe；1400 W 原厂电源、双卡风道、10 GbE、Ubuntu LTS、UPS 与独立备份。整机组合、地区可订购时间及持续满载仍由厂商确认。&lt;/p&gt;
+ &lt;p class=&quot;note&quot;&gt;PXDesign 固定 PyTorch 2.3.1／JAX 0.4.29 及旧 CUDA 扩展；PyTorch 2.7 才明确加入 Blackwell／CUDA 12.8 支持。仅升级 PyTorch 不等于 AF2、内置 Protenix 与生成器都已适配。官方仓 Blackwell 议题中的故障报告是风险线索，不是所有 PRO 6000 都不能运行的证明。&lt;/p&gt;
+ &lt;p class=&quot;note&quot;&gt;依据：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://psref.lenovo.com/syspool/Sys/PDF/ThinkStation/ThinkStation_P8/ThinkStation_P8_Spec.pdf&quot;&gt;联想 P8 PSREF，2026-09-15&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/&quot;&gt;Max-Q 规格&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://pytorch.org/blog/pytorch-2-7/&quot;&gt;PyTorch 官方支持说明&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/issues/2&quot;&gt;PXDesign Blackwell 议题&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+&lt;details class=&quot;panel section&quot; id=&quot;pc-cloud&quot;&gt;&lt;summary&gt;两台云服务器：配置单与文件衔接&lt;/summary&gt;
+ &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;项目&lt;/th&gt;&lt;th&gt;云机 A · 独立 Protenix&lt;/th&gt;&lt;th&gt;云机 B · PXDesign 完整流程&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+ &lt;tr&gt;&lt;td&gt;询租 GPU&lt;/td&gt;&lt;td&gt;1×A100 80 GB 完整卡；H100 80 GB 可另验&lt;/td&gt;&lt;td&gt;同左，内置 AF2／Protenix 筛选也在本机&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;CPU／内存&lt;/td&gt;&lt;td&gt;32 vCPU／256 GB&lt;/td&gt;&lt;td&gt;32 vCPU／256 GB&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;持久磁盘&lt;/td&gt;&lt;td&gt;200 GB 系统 SSD＋2 TB 数据 SSD&lt;/td&gt;&lt;td&gt;200 GB 系统 SSD＋2 TB 数据 SSD&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;共享配套&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;同地域／VPC、内网计算入口、对象存储（首期按 1 TB 可扩容结果空间询价）、已有 Web 入口；只传文件引用、版本、哈希和运行记录&lt;/td&gt;&lt;/tr&gt;
+ &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+ &lt;p&gt;上述为工程询价目标，不是假定某家云商已有等配实例。现成参考：AWS &lt;code&gt;p5.4xlarge&lt;/code&gt; 每台单 H100 80 GB、256 GiB、16 vCPU；CPU 比询价目标少，吞吐另验，持久磁盘另配。本地 NVMe 可丢弃，不能作唯一结果存储。地域可售、账号配额及现价尚未核验。&lt;/p&gt;
+ &lt;p&gt;&lt;strong&gt;一个项目：&lt;/strong&gt;提交目标 → A 预测结构 → 文件归档核验 → 确认链、设计区域／热点与 MSA → B 获取并校验输入 → 生成、序列设计及内部筛选 → 归档候选。已有确认好的结构与条件可跳过本次靶点预测。&lt;/p&gt;
+ &lt;p&gt;&lt;strong&gt;不同项目：&lt;/strong&gt;A 预测甲时，B 可设计输入已齐的乙。A／B 的 GPU、内存和本地盘分别核算；B 内存或盘不足时，不能借 A 的空余容量放行。MSA 按查询序列和版本复用，分别适配格式与编号。&lt;/p&gt;
+ &lt;p class=&quot;note&quot;&gt;自动转接尚未实现；Phase I 只补独立计算和 Web 调试。以后接 Certa 时复用 AME 执行／归档与 GCSGo 业务事实源，不另建项目、轮次或业务调度系统。失败重试保留计算尝试，文件未持久归档不能显示交付完成。&lt;/p&gt;
+ &lt;p class=&quot;note&quot;&gt;云规格：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://docs.aws.amazon.com/ec2/latest/instancetypes/ac.html&quot;&gt;AWS 官方实例表&lt;/a&gt;。阿里云另有同机双 L20 的 &lt;code&gt;ecs.gn8is-2x.8xlarge&lt;/code&gt;：32 vCPU、256 GiB、2×48 GB，磁盘另配；不是 32 物理核裸机等配，也不是完整模型已验收。&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.alibabacloud.com/help/zh/ecs/user-guide/gpu-accelerated-compute-optimized-and-vgpu-accelerated-instance-families-1&quot;&gt;阿里云官方规格&lt;/a&gt;&lt;/p&gt;
+&lt;/details&gt;
+&lt;details class=&quot;panel section&quot; id=&quot;pc-source-details&quot;&gt;&lt;summary&gt;模型、输入规模与官方资源依据：展开核对&lt;/summary&gt;
 &lt;section class=&quot;panel section&quot; id=&quot;pc-evidence&quot;&gt;
  &lt;h3&gt;先看依据：哪些数字能参考，哪些还不知道&lt;/h3&gt;
  &lt;p&gt;&lt;strong&gt;已纠正：&lt;/strong&gt;原页面 B 的“32 GB 显存／48 GB 内存”、C 的“40／64 GB”没有对应的模型实测；它们只是演示排队规则的任意输入。不能从这些数值推导 48／72／96 GB 卡能承载多少任务，也不能据此采购。&lt;/p&gt;
@@ -1848,8 +1900,9 @@ html&gt;body{padding:0}&lt;/style&gt;
  &lt;p&gt;例如 100 条候选，每条用 2 个种子、每种子 5 份结构，最多产生 1,000 份结构结果；失败另计。逐条跑主要增加总耗时和结果盘占用，不等于 100 个进程同时驻留。采样数增大会影响中间张量和结果汇总；有分块也不能断言峰值不变。两个独立进程重叠时，要另测两套进程树和逐卡峰值。&lt;/p&gt;
  &lt;p class=&quot;note&quot;&gt;来源：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/Protenix/blob/85767b811c40ed46e73a9b39519cf6bfca8701ba/protenix/data/inference/infer_dataloader.py#L51-L65&quot;&gt;Protenix 逐输入加载&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/pxdesign/model/generator.py#L210-L230&quot;&gt;PXDesign 分块和汇总&lt;/a&gt;&lt;/p&gt;
 &lt;/section&gt;
-&lt;section class=&quot;panel section&quot; id=&quot;pc-budget-origin&quot;&gt;
- &lt;h3&gt;原演示数字的依据：全部是人为假设&lt;/h3&gt;
+&lt;/details&gt;
+&lt;details class=&quot;panel section&quot; id=&quot;pc-budget-origin&quot;&gt;
+ &lt;summary&gt;原演示数字的依据：全部是人为假设&lt;/summary&gt;
  &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;原默认项&lt;/th&gt;&lt;th&gt;演示值&lt;/th&gt;&lt;th&gt;证据与用途&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
  &lt;tr&gt;&lt;td&gt;B／E：Protenix 任务&lt;/td&gt;&lt;td&gt;显存 32 GB；内存 48 GB；CPU 6 核；新增写盘 10 GB&lt;/td&gt;&lt;td&gt;无对应版本／长度／候选数的测量，不是从官方表推导&lt;/td&gt;&lt;/tr&gt;
  &lt;tr&gt;&lt;td&gt;C：PXDesign 完整任务&lt;/td&gt;&lt;td&gt;显存 40 GB；内存 64 GB；CPU 8 核；新增写盘 40 GB&lt;/td&gt;&lt;td&gt;无完整流程峰值测量，不能对应为 196 token、10 或 500 个骨架的需求&lt;/td&gt;&lt;/tr&gt;
@@ -1858,17 +1911,17 @@ html&gt;body{padding:0}&lt;/style&gt;
  &lt;tr&gt;&lt;td&gt;磁盘演示&lt;/td&gt;&lt;td&gt;已有 900 GB；压缩包 300 GB；解压新增 600 GB＋临时 50 GB；C 留存 20 GB；单盘系统占 200 GB；盘保留 100／200 GB&lt;/td&gt;&lt;td&gt;都不是实际下载清单／文件大小；真实空间要按所选权重、CCD、MSA／模板资料及保留结果分别盘点&lt;/td&gt;&lt;/tr&gt;
  &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
  &lt;p class=&quot;note&quot;&gt;下面收起的模拟器保留这些任意值，用于解释资源分配；与上述试跑负载的实测峰值无对应关系。&lt;/p&gt;
-&lt;/section&gt;
+&lt;/details&gt;
 &lt;section class=&quot;panel section&quot; id=&quot;pc-purchase-check&quot;&gt;
  &lt;h3&gt;采购前只补一份实测记录&lt;/h3&gt;
  &lt;p&gt;按上方固定负载，先小样例，再 500 骨架扩样；单卡验收模型排队与 CPU 步骤重叠，双卡验收两套 GPU 计算重叠。每次记录：源码与权重、GPU／驱动／CUDA／内核、最终配置、输入 token／原子数／MSA 深度、骨架／序列／通过数、进程并发数、逐卡显存峰值、整套父子进程内存峰值、磁盘峰值和耗时。&lt;/p&gt;
- &lt;p&gt;&lt;strong&gt;当前结论：&lt;/strong&gt;48 GB 显卡＋256 GB 内存＋2 TB 系统盘／4 TB 数据盘，只能作为待试租验收的候选配置。尚不能声称“已证明满足正常运行”或“已证明最低配置”；256 GB 内存及 4 TB 数据盘也没有从官方单任务表推导出来。&lt;/p&gt;
+ &lt;p&gt;&lt;strong&gt;当前结论：&lt;/strong&gt;三档双卡、PRO 6000 工作站及双云机均是待验收方案；容量建议与下方任意模拟值不能当成模型实测。采购前锁定输入、完整流程和并发组合，再确认承载范围。&lt;/p&gt;
 &lt;/section&gt;
 
 &lt;details class=&quot;panel section&quot; id=&quot;pc-simulation&quot;&gt;&lt;summary&gt;假设预算推演：仅看排队规则，不判断模型承载或采购&lt;/summary&gt;&lt;p class=&quot;note&quot;&gt;以下默认数值与上方具体试跑负载没有测量对应关系。彩条和置灰只表达你输入的假设，不能当成实机占用。&lt;/p&gt;&lt;div class=&quot;simulation-controls&quot;&gt; &lt;div class=&quot;controls&quot;&gt;
-  &lt;label for=&quot;pc-gpu&quot;&gt;显卡配置&lt;select id=&quot;pc-gpu&quot;&gt;&lt;option value=&quot;single48&quot;&gt;单卡 48 GB · 试租候选&lt;/option&gt;&lt;option value=&quot;dual48&quot;&gt;双卡，各 48 GB&lt;/option&gt;&lt;option value=&quot;single72&quot;&gt;单卡 72 GB · PRO 5000&lt;/option&gt;&lt;option value=&quot;single96&quot;&gt;单卡 96 GB · PRO 6000&lt;/option&gt;&lt;option value=&quot;dualmixed&quot;&gt;双卡 96＋48 GB · 扩展&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+  &lt;label for=&quot;pc-gpu&quot;&gt;假设单机显卡&lt;select id=&quot;pc-gpu&quot;&gt;&lt;option value=&quot;single48&quot;&gt;单卡 48 GB&lt;/option&gt;&lt;option value=&quot;dual48&quot;&gt;双卡，各 48 GB&lt;/option&gt;&lt;option value=&quot;dual80&quot;&gt;双卡，各 80 GB&lt;/option&gt;&lt;option value=&quot;dual141&quot;&gt;双卡，各 141 GB&lt;/option&gt;&lt;option value=&quot;dual96&quot;&gt;双卡，各 96 GB&lt;/option&gt;&lt;option value=&quot;single72&quot;&gt;单卡 72 GB · PRO 5000&lt;/option&gt;&lt;option value=&quot;single96&quot;&gt;单卡 96 GB · PRO 6000&lt;/option&gt;&lt;option value=&quot;dualmixed&quot;&gt;双卡 48＋96 GB&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
   &lt;label for=&quot;pc-cpu&quot;&gt;CPU 物理核&lt;select id=&quot;pc-cpu&quot;&gt;&lt;option value=&quot;16&quot;&gt;16 核&lt;/option&gt;&lt;option value=&quot;32&quot; selected&gt;32 核&lt;/option&gt;&lt;option value=&quot;64&quot;&gt;64 核&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
-  &lt;label for=&quot;pc-ram&quot;&gt;整机内存&lt;select id=&quot;pc-ram&quot;&gt;&lt;option value=&quot;128&quot;&gt;128 GB&lt;/option&gt;&lt;option value=&quot;256&quot;&gt;256 GB&lt;/option&gt;&lt;option value=&quot;512&quot;&gt;512 GB&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+  &lt;label for=&quot;pc-ram&quot;&gt;整机内存&lt;select id=&quot;pc-ram&quot;&gt;&lt;option value=&quot;128&quot;&gt;128 GB&lt;/option&gt;&lt;option value=&quot;256&quot;&gt;256 GB&lt;/option&gt;&lt;option value=&quot;512&quot;&gt;512 GB&lt;/option&gt;&lt;option value=&quot;1024&quot;&gt;1 TB&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
   &lt;label for=&quot;pc-disk&quot;&gt;物理硬盘&lt;select id=&quot;pc-disk&quot;&gt;&lt;option value=&quot;single&quot;&gt;2 TB 单盘&lt;/option&gt;&lt;option value=&quot;split&quot;&gt;2 TB 系统盘＋4 TB 数据盘&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
   &lt;label for=&quot;pc-load&quot;&gt;同时发生的情况&lt;select id=&quot;pc-load&quot;&gt;&lt;option value=&quot;normal&quot;&gt;日常多阶段并发&lt;/option&gt;&lt;option value=&quot;prepare&quot;&gt;还在下载／解压资料&lt;/option&gt;&lt;option value=&quot;busy&quot;&gt;数据盘同时大量读写&lt;/option&gt;&lt;option value=&quot;low&quot;&gt;数据盘空间接近不足&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
   &lt;label for=&quot;pc-event&quot;&gt;模拟运行情况&lt;select id=&quot;pc-event&quot; aria-describedby=&quot;pc-scenario-note&quot;&gt;&lt;option value=&quot;normal&quot;&gt;查看当前运行与排队&lt;/option&gt;&lt;option value=&quot;b_finished&quot;&gt;Protenix 算完，让出显卡&lt;/option&gt;&lt;option value=&quot;c_cancel_requested&quot;&gt;PXDesign 取消中，仍占显卡&lt;/option&gt;&lt;option value=&quot;c_cancel_done&quot;&gt;PXDesign 已取消，显卡已释放&lt;/option&gt;&lt;option value=&quot;c_failed&quot;&gt;PXDesign 失败，进程已退出&lt;/option&gt;&lt;option value=&quot;c_retry&quot;&gt;PXDesign 失败后重新排队&lt;/option&gt;&lt;option value=&quot;c_zero&quot;&gt;PXDesign 算完，零候选通过&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
@@ -1911,8 +1964,8 @@ html&gt;body{padding:0}&lt;/style&gt;
  &lt;p&gt;同一个项目：输入确认 → Protenix 得到结构（已有合格结构可直接使用）→ 确认设计区域 → PXDesign 生成骨架、设计序列、评分 → 整理候选。下方演示的是不同项目：B 与 C 的输入各自已就绪，因此可以讨论并行；同项目的上游结果未就绪时，加卡也不能跳过依赖。&lt;/p&gt;
  &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;阶段&lt;/th&gt;&lt;th&gt;单卡时&lt;/th&gt;&lt;th&gt;双卡时&lt;/th&gt;&lt;th&gt;主要资源&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
  &lt;tr&gt;&lt;td&gt;下载／解压、校验输入；选用的本地 MSA 搜索&lt;/td&gt;&lt;td&gt;可与一项模型计算并行&lt;/td&gt;&lt;td&gt;可与两项模型计算并行&lt;/td&gt;&lt;td&gt;CPU、内存、网络／磁盘；仍须预算充足。MSA 若走远端不计成本机搜索&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;Protenix 核心结构预测&lt;/td&gt;&lt;td&gt;与 PXDesign GPU 阶段轮流；等待项置灰&lt;/td&gt;&lt;td&gt;可在 GPU 0 与另一卡的 PXDesign 同时执行&lt;/td&gt;&lt;td&gt;B 的逐卡显存、CPU、内存、写盘预算&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;PXDesign 骨架生成 → ProteinMPNN 序列设计 → AF2／Protenix 评分&lt;/td&gt;&lt;td&gt;整个任务保守地占同一 GPU 名额，不能在评分时提前让卡&lt;/td&gt;&lt;td&gt;固定 GPU 1；输入就绪、容量及环境验证后与 B 并行&lt;/td&gt;&lt;td&gt;C 的完整任务峰值预算；子进程可能与生成模型重叠，不把各阶段峰值简单相加&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;Protenix 核心结构预测&lt;/td&gt;&lt;td&gt;与 PXDesign GPU 阶段轮流；等待项置灰&lt;/td&gt;&lt;td&gt;固定物理 GPU 1，与 GPU 0 的 PXDesign 并行安排&lt;/td&gt;&lt;td&gt;B 的逐卡显存、CPU、内存、写盘预算&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;PXDesign 骨架生成 → ProteinMPNN 序列设计 → AF2／Protenix 评分&lt;/td&gt;&lt;td&gt;整个任务保守地占同一 GPU 名额，不能在评分时提前让卡&lt;/td&gt;&lt;td&gt;固定物理 GPU 0；父子进程都核验卡号，条件通过后与 B 并行&lt;/td&gt;&lt;td&gt;C 的完整任务峰值预算；子进程可能与生成模型重叠，不把各阶段峰值简单相加&lt;/td&gt;&lt;/tr&gt;
  &lt;tr&gt;&lt;td&gt;所有模型父子进程退出后的结果整理、查看／下载&lt;/td&gt;&lt;td&gt;可与后续模型计算并行&lt;/td&gt;&lt;td&gt;同左&lt;/td&gt;&lt;td&gt;CPU、内存、磁盘；峰值须测量；模拟区的 D／F 数字仅为假设&lt;/td&gt;&lt;/tr&gt;
  &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
 &lt;/section&gt;
@@ -1921,57 +1974,6 @@ html&gt;body{padding:0}&lt;/style&gt;
  &lt;div&gt;&lt;strong&gt;内存不足 → 新任务先等&lt;/strong&gt;不能靠硬盘交换空间（Swap）硬撑；频繁交换增加读写、拖慢整机。GPU 空着也可能开不了任务。&lt;/div&gt;
  &lt;div&gt;&lt;strong&gt;任务退出 → 文件还在&lt;/strong&gt;进程对象释放，文件缓存可能保留且可回收；失败日志、结构和中间文件仍占盘，按保留规则清理。&lt;/div&gt;
 &lt;/div&gt;&lt;/section&gt;
-&lt;details class=&quot;panel section&quot; id=&quot;pc-recommendation&quot; open&gt;&lt;summary&gt;单卡试租配置单：待同负载实测验收&lt;/summary&gt;
- &lt;p&gt;&lt;strong&gt;试租候选：RTX 6000 Ada Generation 48 GB。&lt;/strong&gt;两套工具分别建环境，共用这张卡，GPU 重计算排队。选择 Ada 是为减少 PXDesign 旧版软件栈对 Blackwell 的额外适配工作，不表示本项目已实机跑通。此推荐以官方小样例及代表性靶点能放入单卡为前提，不覆盖所有输入规模。&lt;/p&gt;
- &lt;p&gt;&lt;strong&gt;“正常运行”怎样验收：&lt;/strong&gt;Protenix v1 真实预测得到可解析结构及对应指标；PXDesign 完整生成、序列设计、AF2／Protenix 评分得到实际结果，零候选也要有筛选记录；等待、取消、失败后可继续使用。先按&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/README.md#L449&quot;&gt;官方调试建议&lt;/a&gt;做 10 个样本，扩样时显式指定 500 个并单独验收；调小批量不能保证降低完整流程的显存峰值。&lt;/p&gt;
- &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;部件&lt;/th&gt;&lt;th&gt;推荐要求&lt;/th&gt;&lt;th&gt;配套确认&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
- &lt;tr&gt;&lt;td&gt;显卡&lt;/td&gt;&lt;td&gt;1× NVIDIA RTX 6000 Ada Generation，48 GB ECC&lt;/td&gt;&lt;td&gt;300 W 主动散热；Protenix／PXDesign 两环境轮流使用同一张卡&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;CPU&lt;/td&gt;&lt;td&gt;1× AMD Threadripper PRO 7975WX，32 核／64 线程&lt;/td&gt;&lt;td&gt;350 W 标称；用于资料准备、解析与结果服务的并发余量&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;主板&lt;/td&gt;&lt;td&gt;1× ASUS Pro WS WRX90E-SAGE SE，或整机商同级平台&lt;/td&gt;&lt;td&gt;八通道 ECC RDIMM、EEB；预留第二卡与独立 NVMe 插槽；此板官方系统栏仅列 Windows，Linux 由整机验收&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;内存&lt;/td&gt;&lt;td&gt;8×32 GB DDR5 ECC RDIMM＝256 GB&lt;/td&gt;&lt;td&gt;按主板兼容清单整套核配；不是实测最低值；升级 512 GB 时更换为 8×64 GB&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;系统盘&lt;/td&gt;&lt;td&gt;独立 2 TB NVMe SSD&lt;/td&gt;&lt;td&gt;系统、环境、基础服务；不承接大量计算临时文件&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;数据盘&lt;/td&gt;&lt;td&gt;独立 4 TB NVMe SSD&lt;/td&gt;&lt;td&gt;放权重、CCD／所选资料、临时文件与结果；关注持续读写、耐久度与容量&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;机箱&lt;/td&gt;&lt;td&gt;1× EEB 全塔工作站机箱，预留两张双槽卡&lt;/td&gt;&lt;td&gt;由整机商确认散热间距、显卡长度及线材空间；有扩展位不代表双卡散热已通过&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;电源／散热&lt;/td&gt;&lt;td&gt;1×1600 W 级高品质电源；匹配 350 W CPU 的散热及完整风道&lt;/td&gt;&lt;td&gt;是工程余量推荐，非模型最低功率要求；以后加 600 W 卡需重新核配&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;运维配套&lt;/td&gt;&lt;td&gt;有线网络、独立结果备份、UPS&lt;/td&gt;&lt;td&gt;UPS 看整机实际瓦数与续航；同盘副本不算独立备份&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;交付&lt;/td&gt;&lt;td&gt;Linux 原生；Protenix／PXDesign 分别锁环境&lt;/td&gt;&lt;td&gt;Ubuntu LTS 与驱动具体组合经样机验收固定；容器／K8s 可后续适配&lt;/td&gt;&lt;/tr&gt;
- &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
- &lt;p class=&quot;warning&quot;&gt;本期接受 GPU 排队，不接受整个产品停止响应。若单次输入超出 48 GB，先调整经科学确认的输入／配置，或短租 72／96 GB 卡验证；不能靠减少总样本数保证解决。若等待已影响调试效率，再考虑双卡。大内存不补显存，2×48 GB 不合成单任务 96 GB。&lt;/p&gt;
- &lt;p&gt;前置资料：v1 权重、CCD、选用的 MSA／模板资料齐全；本期不默认下载训练集或全量本地搜索库。当前独立 Protenix 采用 PyTorch 2.7.1，首次配置须核验驱动、CUDA 包和自定义内核。&lt;/p&gt;
- &lt;p&gt;独立 Protenix 与 PXDesign 使用不同 PyTorch／CUDA 环境。PXDesign 脚本锁 PyTorch 2.3.1、JAX 0.4.29 和 Protenix v0.5.0+pxd；Ada 方案仍须验收完整流程。若选 72／96 GB Blackwell 卡，还要处理旧依赖适配；增大显存不解决软件兼容。当前 Protenix v2 另拒绝超过 2560 token 的输入，大卡不解除该软件限制。&lt;/p&gt;
- &lt;p class=&quot;note&quot;&gt;已核对资料与源码，未运行 GPU 模型。采购判断以同负载实测为准。&lt;/p&gt;
-&lt;/details&gt;
-&lt;details class=&quot;panel section&quot; id=&quot;pc-models&quot;&gt;&lt;summary&gt;配卡候选：容量规格，不是模型承载结论&lt;/summary&gt;
- &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;方案&lt;/th&gt;&lt;th&gt;具体型号&lt;/th&gt;&lt;th&gt;区别&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
- &lt;tr&gt;&lt;td&gt;单卡 48 GB · 试租候选&lt;/td&gt;&lt;td&gt;&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/rtx-6000/&quot;&gt;RTX 6000 Ada Generation&lt;/a&gt;；其他候选 &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/content/dam/en-zz/Solutions/products/workstations/nvidia-rtx-a6000-datasheet.pdf&quot;&gt;RTX A6000（Ampere）&lt;/a&gt;&lt;/td&gt;&lt;td&gt;均为 300 W 主动散热；两代产品，不能因容量相同就当性能相同；按实际输入试跑&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;双卡，各 48 GB&lt;/td&gt;&lt;td&gt;2×上述同型号卡，整机核配&lt;/td&gt;&lt;td&gt;把两个已验证能放入 48 GB 的任务分别放卡；不等于单任务 96 GB&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;单卡 72 GB&lt;/td&gt;&lt;td&gt;&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/&quot;&gt;RTX PRO 5000 72GB Blackwell&lt;/a&gt;&lt;/td&gt;&lt;td&gt;300 W 主动散热；订单写明 72 GB SKU，同系列另有 48 GB 版&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;单卡 96 GB · 容量升配&lt;/td&gt;&lt;td&gt;&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/&quot;&gt;RTX PRO 6000 Blackwell Workstation Edition&lt;/a&gt;&lt;/td&gt;&lt;td&gt;最高 600 W；单任务显存余量更大，不是小批量研发必需，需 Blackwell 软件适配验收&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;双卡 96＋48 GB · 扩展&lt;/td&gt;&lt;td&gt;PRO 6000 Blackwell 96 GB＋RTX 6000 Ada 48 GB&lt;/td&gt;&lt;td&gt;Protenix 与 PXDesign 分卡执行；完整整机要求见下一项，不是当前采购前提&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;48 GB 服务器租赁补充&lt;/td&gt;&lt;td&gt;&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.nvidia.com/en-gb/data-center/l40s/&quot;&gt;NVIDIA L40S&lt;/a&gt;&lt;/td&gt;&lt;td&gt;350 W 被动散热，依靠服务器强制风道；不直接替换普通塔式卡&lt;/td&gt;&lt;/tr&gt;
- &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
-&lt;/details&gt;
-&lt;details class=&quot;panel section&quot; id=&quot;pc-dual&quot;&gt;&lt;summary&gt;双卡完整整机扩展单：需要两个 GPU 任务同时计算时再采用&lt;/summary&gt;
- &lt;p&gt;这套扩展的默认分工：GPU 0＝96 GB Protenix；GPU 1＝48 GB PXDesign。空闲卡可接其他已通过该卡容量及环境试跑的任务，运行中的任务不迁卡。PXDesign 在 Ada 卡上避开直接移到 Blackwell 的额外适配；每项任务仍须分别通过容量试跑，混卡不能自动保证并行成功。&lt;/p&gt;
- &lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;部件&lt;/th&gt;&lt;th&gt;数量与规格／询配型号&lt;/th&gt;&lt;th&gt;负责内容及配套要求&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
- &lt;tr&gt;&lt;td&gt;Protenix 显卡&lt;/td&gt;&lt;td&gt;1× RTX PRO 6000 Blackwell Workstation Edition，96 GB&lt;/td&gt;&lt;td&gt;最高 600 W；约 137×305 mm 双槽；核验 Blackwell 环境与贯通散热&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;PXDesign 显卡&lt;/td&gt;&lt;td&gt;1× RTX 6000 Ada Generation，48 GB&lt;/td&gt;&lt;td&gt;最高 300 W；约 112×267 mm 双槽；完整生成及评分都计入本卡占用&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;CPU／主板&lt;/td&gt;&lt;td&gt;1× Threadripper PRO 7975WX＋1× ASUS Pro WS WRX90E-SAGE SE&lt;/td&gt;&lt;td&gt;32 核／64 线程；EEB、八通道、四个 M.2；核对双卡实际插槽和风道，Linux 整机验收&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;内存&lt;/td&gt;&lt;td&gt;8×64 GB DDR5 ECC RDIMM＝512 GB&lt;/td&gt;&lt;td&gt;两套模型进程、子工具、CPU 准备及缓存的工程余量，非官方最低值；八槽全满&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;系统盘&lt;/td&gt;&lt;td&gt;1×2 TB NVMe SSD&lt;/td&gt;&lt;td&gt;系统、两个环境、程序与必要日志&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;固定资料盘&lt;/td&gt;&lt;td&gt;1×4 TB NVMe SSD&lt;/td&gt;&lt;td&gt;权重、CCD、选定比对／模板数据，准备完成后以读取为主&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;任务工作盘&lt;/td&gt;&lt;td&gt;1×4 TB NVMe SSD&lt;/td&gt;&lt;td&gt;解压临时文件、搜索临时文件、候选与结果；按任务隔离目录和写入预算&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;机箱&lt;/td&gt;&lt;td&gt;1× Phanteks Enthoo Pro II Server Edition 或同级 EEB 工作站机箱&lt;/td&gt;&lt;td&gt;整机商核配两张双槽卡、供电线弯折余量、CPU／GPU 风道；不凭机箱尺寸宣告兼容&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;CPU 散热&lt;/td&gt;&lt;td&gt;1× Noctua NH-U14S TR5-SP6 或同级整机方案&lt;/td&gt;&lt;td&gt;匹配 7975WX；配齐机箱与 M.2 散热，并验收持续 CPU＋双 GPU 负载&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;电源&lt;/td&gt;&lt;td&gt;1×2000 W 级，候选 FSP CANNON PRO 2000W（12V-2x6）&lt;/td&gt;&lt;td&gt;候选型号 FSP2000-52AGPBI 在 200–240 V 输入时额定 2000 W；核配 GPU／主板所有接头及线束，不共用不合规转接线&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;网络／UPS／备份&lt;/td&gt;&lt;td&gt;板载 10 GbE＋配套网络；UPS 1 台；独立备份位置&lt;/td&gt;&lt;td&gt;UPS、现场插座及回路按整机实际瓦数和所需关机时间核配；不靠电池长时间计算&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;系统与环境&lt;/td&gt;&lt;td&gt;Linux 原生，分别锁定两个模型环境&lt;/td&gt;&lt;td&gt;一套共同支持两卡的驱动；核验父子进程对应 GPU UUID，取消后确认资源释放&lt;/td&gt;&lt;/tr&gt;
- &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
- &lt;p class=&quot;note&quot;&gt;CPU 与两卡标称功率合计 1250 W，不是整机实测功耗，尚未计入主板、内存与盘等。2000 W 为工程余量；候选电源不是整机兼容认证。三块物理盘降低系统与数据读写争抢，不是故障隔离或自动备份。&lt;/p&gt;
- &lt;p&gt;上方交互只推演所选单盘或系统／数据双盘，不把这套三盘扩展的 10 TB 合并成一个可用数据盘。双卡选项也只切换 GPU，内存仍按独立选项；实际扩展按本表配置验收。&lt;/p&gt;
- &lt;p&gt;PXDesignBench 的子进程会重新设置 GPU 可见列表，不能仅给父进程设置一次 CUDA_VISIBLE_DEVICES 就声称完成隔离。必须确认父进程、ProteinMPNN、AF2 和 Protenix 评分的实际物理卡归属。&lt;/p&gt;
- &lt;p class=&quot;note&quot;&gt;规格来源：&lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.asus.com/motherboards-components/motherboards/workstation/pro-ws-wrx90e-sage-se/techspec/&quot;&gt;ASUS 主板&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.amd.com/en/support/downloads/drivers.html/processors/ryzen-threadripper-pro/amd-ryzen-threadripper-pro-7000-wx-series/amd-ryzen-threadripper-pro-7975wx.html&quot;&gt;AMD CPU&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.fsplifestyle.com/fr/product/cannonpro2000w_12V2X6.html&quot;&gt;FSP 电源&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://phanteks.com/product/enthoo-pro-2-server-edition-tg/&quot;&gt;Phanteks 机箱&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://www.noctua.at/en/products/nh-u14s-tr5-sp6/compatibility/cpus?socketId=39&amp;amp;vendorId=2&quot;&gt;Noctua 散热&lt;/a&gt; · &lt;a target=&quot;_blank&quot; rel=&quot;noopener&quot; href=&quot;https://github.com/bytedance/PXDesignBench/blob/v0.1.2/pxdbench/tools/base.py#L38-L41&quot;&gt;子进程绑定源码&lt;/a&gt;&lt;/p&gt;
-&lt;/details&gt;
 &lt;details class=&quot;panel section&quot;&gt;&lt;summary&gt;开发验收与依据&lt;/summary&gt;
  &lt;p&gt;Web 展示同一计算入口的执行事实，不复制 Certa 业务状态。输入未就绪、等显卡、等内存、等磁盘空间、读写繁忙分别反馈。PXDesign 评分阶段可能仍有生成模型与子进程占用，不能按阶段名归零。&lt;/p&gt;
  &lt;p&gt;实测记录整机 MemAvailable、任务进程树内存与共享页、每卡实际显存、各挂载点剩余空间与预留、读写等待和延迟；冷启动与重复执行分开测。不要把各进程 RSS 相加后再加一遍文件缓存。&lt;/p&gt;
@@ -1985,15 +1987,59 @@ html&gt;body{padding:0}&lt;/style&gt;
 &lt;script&gt;
 (()=&gt;{
 const root=document.getElementById(&#x27;px-product-concurrency&#x27;),$=s=&gt;root.querySelector(s);
-const choices={single48:[48],dual48:[48,48],single72:[72],single96:[96],dualmixed:[96,48]};
-const names={single48:&#x27;单卡 48 GB&#x27;,dual48:&#x27;双卡，各 48 GB&#x27;,single72:&#x27;单卡 72 GB&#x27;,single96:&#x27;单卡 96 GB&#x27;,dualmixed:&#x27;双卡 96＋48 GB&#x27;};
+const choices={single48:[48],dual48:[48,48],dual80:[80,80],dual141:[141,141],dual96:[96,96],single72:[72],single96:[96],dualmixed:[48,96]};
+const names={single48:&#x27;单卡 48 GB&#x27;,dual48:&#x27;双卡，各 48 GB&#x27;,dual80:&#x27;双卡，各 80 GB&#x27;,dual141:&#x27;双卡，各 141 GB&#x27;,dual96:&#x27;双卡，各 96 GB&#x27;,single72:&#x27;单卡 72 GB&#x27;,single96:&#x27;单卡 96 GB&#x27;,dualmixed:&#x27;双卡 48＋96 GB&#x27;};
 const events=[&#x27;normal&#x27;,&#x27;b_finished&#x27;,&#x27;c_cancel_requested&#x27;,&#x27;c_cancel_done&#x27;,&#x27;c_failed&#x27;,&#x27;c_retry&#x27;,&#x27;c_zero&#x27;];
-let state={gpu:&#x27;single48&#x27;,cpu:32,ram:256,disk:&#x27;split&#x27;,load:&#x27;normal&#x27;,event:&#x27;normal&#x27;,aCpu:8,bCpu:6,cCpu:8,bVram:32,cVram:40,aRam:24,bRam:48,cRam:64,existing:900,package:300,unpack:600,cSaved:20,selected:&#x27;B&#x27;};
+let state={plan:&#x27;tier2&#x27;,relation:&#x27;cross&#x27;,gate:&#x27;predicting&#x27;,gpu:&#x27;dual80&#x27;,cpu:64,ram:512,disk:&#x27;split&#x27;,load:&#x27;normal&#x27;,event:&#x27;normal&#x27;,aCpu:8,bCpu:6,cCpu:8,bVram:32,cVram:40,aRam:24,bRam:48,cRam:64,existing:900,package:300,unpack:600,cSaved:20,selected:&#x27;B&#x27;};
 const defs={A:{title:&#x27;输入资料准备&#x27;,tool:&#x27;CPU 准备入口&#x27;,input:&#x27;目标序列／结构、所选参考资料&#x27;,output:&#x27;已校验输入与参考资料&#x27;,next:&#x27;资料齐全再申请预测资源&#x27;},B:{title:&#x27;靶点结构预测&#x27;,tool:&#x27;Protenix（任意预算演示）&#x27;,input:&#x27;已校验输入、固定权重与必要资料&#x27;,output:&#x27;预测结构 CIF、置信度与运行记录&#x27;,next:&#x27;计算进程退出后核验结果&#x27;},C:{title:&#x27;候选序列设计&#x27;,tool:&#x27;PXDesign（任意预算演示）&#x27;,input:&#x27;目标结构、设计区域与条件&#x27;,output:&#x27;候选序列、设计结构与筛选记录&#x27;,next:&#x27;骨架生成→序列设计→评分／复核→结果核验&#x27;},D:{title:&#x27;另一项目结果整理&#x27;,tool:&#x27;模型进程已经退出&#x27;,input:&#x27;另一任务已落盘的原始结果&#x27;,output:&#x27;核验后的结构／序列清单&#x27;,next:&#x27;核验通过后可查看下载&#x27;},E:{title:&#x27;另一批候选复核&#x27;,tool:&#x27;Protenix&#x27;,input:&#x27;已就绪的目标与候选定义&#x27;,output:&#x27;复合物结构与指标&#x27;,next:&#x27;获得合适 GPU 后执行&#x27;},F:{title:&#x27;查看已完成结果&#x27;,tool:&#x27;结果服务&#x27;,input:&#x27;已核验的结构、序列与记录&#x27;,output:&#x27;现有结果查看与下载&#x27;,next:&#x27;读取已有文件，不重新启动模型&#x27;}};
 const esc=s=&gt;String(s).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,c=&gt;({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#39;&#x27;}[c]));
+const profiles={
+ tier1:{title:&#x27;一档 · 双 L20 48 GB&#x27;,gpus:[48,48],cpu:&#x27;32 物理核&#x27;,ram:&#x27;256 GB&#x27;,disk:&#x27;2 TB 系统＋4 TB 数据 NVMe&#x27;,basis:&#x27;官方有 L20 完整流程耗时线索；没有本项目显存／内存峰值。只作为小规模试租档。&#x27;},
+ tier2:{title:&#x27;二档 · 双 A100 80 GB · 主推荐&#x27;,gpus:[80,80],cpu:&#x27;64 物理核&#x27;,ram:&#x27;512 GB&#x27;,disk:&#x27;2 TB 系统＋2×3.84 TB 数据 NVMe&#x27;,basis:&#x27;A100 为 PXDesign 官方推荐架构；选择 80 GB 及其余容量是工程留余量，完整并发待测。&#x27;},
+ tier3:{title:&#x27;三档 · 双 H200 NVL 141 GB&#x27;,gpus:[141,141],cpu:&#x27;64 物理核起&#x27;,ram:&#x27;1 TB&#x27;,disk:&#x27;2 TB 系统＋2×7.68 TB 数据 NVMe&#x27;,basis:&#x27;141 GB 是官方卡容量；Hopper 与官方推荐的 H100 路线接近，但本项目 H200 完整流程仍未验收。&#x27;},
+ cloud:{title:&#x27;双云机 · 各独占一张 80 GB GPU&#x27;,gpus:[80,80],cpu:&#x27;每台 32 vCPU 询价目标&#x27;,ram:&#x27;每台 256 GB&#x27;,disk:&#x27;每台 200 GB 系统＋2 TB 持久 SSD&#x27;,cloud:true,basis:&#x27;A100 80 GB 为询租目标，H100 80 GB 可另验；不是已找到的完全等配 SKU。AWS 现成参考为每台 16 vCPU／256 GiB，见双云机配套。&#x27;},
+ pro96dual:{title:&#x27;P8 工作站 · 双 PRO 6000 Max-Q 96 GB&#x27;,gpus:[96,96],cpu:&#x27;9975WX 32 核／9985WX 64 核&#x27;,ram:&#x27;512 GB（8×64 GB）&#x27;,disk:&#x27;2 TB 系统＋2×4 TB 数据 NVMe&#x27;,blackwell:true,basis:&#x27;P8 官方支持多张 Max-Q 300 W 版；硬件方案成立。PXDesign 旧依赖的 Blackwell 完整链需适配验收。&#x27;},
+ pro96single:{title:&#x27;工作站 · 单 PRO 6000 96 GB&#x27;,gpus:[96],cpu:&#x27;32 物理核起&#x27;,ram:&#x27;256 GB 起，容量待验&#x27;,disk:&#x27;2 TB 系统＋4 TB 数据 NVMe&#x27;,blackwell:true,basis:&#x27;96 GB 是单卡容量；本期保守策略让两套模型排队。小输入共享显存并非绝对禁止，但尚无稳定并发实测。&#x27;},
+ mixed:{title:&#x27;工作站 · Ada 48 GB＋PRO 6000 96 GB&#x27;,gpus:[48,96],cpu:&#x27;32 物理核起&#x27;,ram:&#x27;512 GB&#x27;,disk:&#x27;2 TB 系统＋2×4 TB 数据 NVMe&#x27;,mixed:true,basis:&#x27;保留混卡路线：PXDesign 用 Ada 物理卡 0，独立 Protenix 用 Blackwell 物理卡 1；共同驱动、CUDA 内核及满载整机组合须另验。&#x27;},
+ single48:{title:&#x27;对照 · 单 RTX 6000 Ada 48 GB&#x27;,gpus:[48],cpu:&#x27;32 物理核&#x27;,ram:&#x27;256 GB&#x27;,disk:&#x27;2 TB 系统＋4 TB 数据 NVMe&#x27;,basis:&#x27;允许 GPU 排队的研发起测方案；不是两套完整计算稳定同时跑的已验证方案。&#x27;},
+ single72:{title:&#x27;对照 · 单 PRO 5000 72 GB&#x27;,gpus:[72],cpu:&#x27;32 物理核&#x27;,ram:&#x27;256 GB&#x27;,disk:&#x27;2 TB 系统＋4 TB 数据 NVMe&#x27;,blackwell:true,basis:&#x27;72 GB 是该 SKU 单卡容量。仍按本期策略排队，PXDesign 的 Blackwell 适配与任务峰值均待验。&#x27;}
+};
+const relations=[&#x27;cross&#x27;,&#x27;new&#x27;,&#x27;known&#x27;],gates=[&#x27;predicting&#x27;,&#x27;archive&#x27;,&#x27;review&#x27;,&#x27;transfer_failed&#x27;,&#x27;ready&#x27;];
+function planView(plan=state.plan,relation=state.relation,gate=state.gate){
+ const p=profiles[plan],single=p.gpus.length===1,cross=relation===&#x27;cross&#x27;,ready=relation===&#x27;known&#x27;||cross||gate===&#x27;ready&#x27;;
+ const ptx=cross||relation===&#x27;new&#x27;&amp;&amp;gate===&#x27;predicting&#x27;;
+ const px=ready&amp;&amp;(!single||!ptx);
+ let wait=&#x27;&#x27;;
+ if(!ready)wait={predicting:&#x27;等上一步：靶点结构还没预测出来。&#x27;,archive:&#x27;等文件：预测已结束，结构尚未持久归档并校验；释放 GPU 不代表输入可用。&#x27;,review:&#x27;等科学确认：链、设计区域／热点与相应 MSA 尚未确认。&#x27;,transfer_failed:&#x27;等文件交接：下游输入下载或哈希校验失败；不能启动设计。&#x27;}[gate];
+ else if(!px)wait=&#x27;等 GPU：本期一张卡一次一个完整重任务；预测结束并确认进程退出后，才能安排设计。&#x27;;
+ let headline=ptx&amp;&amp;px?&#x27;可分卡重叠安排；完整流程资源峰值仍待实测&#x27;:px?&#x27;设计输入已就绪，可安排 PXDesign；不强制重复预测&#x27;:ptx?&#x27;当前安排 Protenix；PXDesign 置灰等待&#x27;:&#x27;预测 GPU 已释放；PXDesign 仍在等输入条件&#x27;;
+ const locationP=p.cloud?&#x27;云机 A · 本机 GPU 0&#x27;:single?&#x27;同机 GPU 0&#x27;:&#x27;同机物理 GPU 1&#x27;;
+ const locationX=p.cloud?&#x27;云机 B · 本机 GPU 0&#x27;:&#x27;同机物理 GPU 0&#x27;;
+ return{p,single,cross,ptx,px,ready,wait,headline,locationP,locationX,parallel:ptx&amp;&amp;px};
+}
+function renderPlan(){
+ const v=planView(),p=v.p;
+ $(&#x27;#pc-plan&#x27;).value=state.plan;$(&#x27;#pc-relation&#x27;).value=state.relation;$(&#x27;#pc-gate&#x27;).value=state.gate;$(&#x27;#pc-gate-label&#x27;).hidden=state.relation!==&#x27;new&#x27;;
+ const phase=state.relation===&#x27;cross&#x27;?[&#x27;就绪&#x27;,&#x27;甲预测中&#x27;,&#x27;乙已确认&#x27;,v.px?&#x27;乙设计可安排&#x27;:&#x27;乙等 GPU&#x27;,&#x27;结果待归档&#x27;]:state.relation===&#x27;known&#x27;?[&#x27;已有资料&#x27;,&#x27;本次跳过&#x27;,&#x27;已确认&#x27;,&#x27;设计可安排&#x27;,&#x27;结果待归档&#x27;]:[&#x27;已准备&#x27;,state.gate===&#x27;predicting&#x27;?&#x27;当前步骤&#x27;:&#x27;预测结束&#x27;,[&#x27;ready&#x27;,&#x27;transfer_failed&#x27;].includes(state.gate)?&#x27;已确认&#x27;:&#x27;等待确认&#x27;,v.px?&#x27;设计可安排&#x27;:&#x27;等待输入&#x27;,&#x27;结果待归档&#x27;];
+ const steps=[&#x27;1 输入&#x27;,&#x27;2 靶点结构&#x27;,&#x27;3 区域／位点确认&#x27;,&#x27;4 候选生成与内部筛选&#x27;,&#x27;5 归档交付&#x27;];
+ const lane=(title,status,reason,blocked)=&gt;&#x27;&lt;div class=&quot;plan-lane &#x27;+(blocked?&#x27;is-wait&#x27;:&#x27;&#x27;)+&#x27;&quot; data-plan-job=&quot;&#x27;+(title.startsWith(&#x27;Protenix&#x27;)?&#x27;protenix&#x27;:&#x27;pxdesign&#x27;)+&#x27;&quot; data-available=&quot;&#x27;+(!blocked)+&#x27;&quot;&gt;&lt;div&gt;&lt;strong&gt;&#x27;+esc(title)+&#x27;&lt;/strong&gt;&lt;br&gt;&lt;span class=&quot;tag &#x27;+(blocked?&#x27;wait&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+esc(status)+&#x27;&lt;/span&gt;&lt;/div&gt;&lt;p&gt;&#x27;+esc(reason)+&#x27;&lt;/p&gt;&lt;/div&gt;&#x27;;
+ let html=&#x27;&lt;p class=&quot;plan-headline&quot;&gt;&#x27;+esc(v.headline)+&#x27;&lt;/p&gt;&lt;p&gt;&lt;span class=&quot;tag wait&quot;&gt;全方案待同负载实测&lt;/span&gt;&#x27;+esc(p.title)+&#x27;&lt;/p&gt;&#x27;;
+ html+=&#x27;&lt;ol class=&quot;plan-steps&quot;&gt;&#x27;+steps.map((s,i)=&gt;&#x27;&lt;li class=&quot;&#x27;+(i===3&amp;&amp;!v.px?&#x27;is-wait&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+esc(s)+&#x27;：&#x27;+esc(phase[i])+&#x27;&lt;/li&gt;&#x27;).join(&#x27;&#x27;)+&#x27;&lt;/ol&gt;&#x27;;
+ html+=lane(&#x27;Protenix 独立预测&#x27;,v.ptx?&#x27;规划可安排&#x27;:&#x27;本次不占 GPU&#x27;,v.ptx?v.locationP+&#x27;；&#x27;+(v.cross?&#x27;预测项目甲，与项目乙各用各的输入。&#x27;:&#x27;先产出本项目结构。&#x27;):(state.relation===&#x27;known&#x27;?&#x27;已有确认结构，可跳过本次预测。&#x27;:&#x27;预测进程已退出，继续完成归档或科学确认。&#x27;),!v.ptx);
+ html+=lane(&#x27;PXDesign 完整设计&#x27;,v.px?&#x27;规划可安排&#x27;:v.ready?&#x27;等待 GPU&#x27;:&#x27;等待上一步／文件&#x27;,v.px?v.locationX+&#x27;；生成骨架 → ProteinMPNN 序列 → AF2／内置 Protenix 筛选。内部评分结束且父子进程退出前，继续保留本卡。&#x27;:v.wait,!v.px);
+ html+=&#x27;&lt;p class=&quot;note&quot;&gt;CPU 输入准备、结果整理与查看可与模型计算重叠安排，但还要验 CPU、内存和盘余量。预测结构本身不包含设计区域决策；零候选要给真实筛选记录。&lt;/p&gt;&#x27;;
+ if(p.cloud){
+  html+=&#x27;&lt;div class=&quot;plan-grid&quot;&gt;&#x27;+[[&#x27;云机 A · 独立 Protenix&#x27;,&#x27;GPU 0 · 完整 80 GB&#x27;,&#x27;256 GB 内存&#x27;,&#x27;200 GB 系统＋2 TB 持久数据盘&#x27;],[&#x27;云机 B · PXDesign 全流程&#x27;,&#x27;GPU 0 · 完整 80 GB&#x27;,&#x27;256 GB 内存&#x27;,&#x27;200 GB 系统＋2 TB 持久数据盘&#x27;]].map(h=&gt;&#x27;&lt;div class=&quot;plan-host&quot;&gt;&lt;h3&gt;&#x27;+esc(h[0])+&#x27;&lt;/h3&gt;&lt;p&gt;&#x27;+esc(h[1])+&#x27;；&#x27;+esc(h[2])+&#x27;&lt;/p&gt;&lt;p&gt;&#x27;+esc(h[3])+&#x27;&lt;/p&gt;&lt;p class=&quot;note&quot;&gt;CPU 询价目标 32 vCPU；此主机显存／内存／写盘峰值均待测。&lt;/p&gt;&lt;/div&gt;&#x27;).join(&#x27;&#x27;)+&#x27;&lt;/div&gt;&lt;p&gt;文件交接：A 结构归档并核验 → 确认设计条件 → B 获取并核验。两机内存和本地盘分别核算，不能合成一个资源池；任一机资源不足只阻塞本机。自动衔接尚未实现。&lt;/p&gt;&#x27;;
+ }else{
+  const cards=p.gpus.map((gb,i)=&gt;&#x27;&lt;p&gt;&#x27;+esc(&#x27;物理 GPU &#x27;+i+&#x27;：&#x27;+gb+&#x27; GB；&#x27;+(v.single?&#x27;两工具按策略轮流&#x27;:i===0?&#x27;PXDesign 全流程及子进程&#x27;:&#x27;独立 Protenix&#x27;))+&#x27;&lt;/p&gt;&#x27;).join(&#x27;&#x27;);
+  html+=&#x27;&lt;div class=&quot;plan-grid&quot;&gt;&lt;div class=&quot;plan-host&quot;&gt;&lt;h3&gt;GPU 规格与归属&lt;/h3&gt;&#x27;+cards+&#x27;&lt;p class=&quot;note&quot;&gt;各卡实际显存峰值：待测。没有测量就不显示“已用／剩余 GB”。&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;plan-host&quot;&gt;&lt;h3&gt;全机 CPU、内存与硬盘&lt;/h3&gt;&lt;p&gt;&#x27;+esc(p.cpu)+&#x27;；内存 &#x27;+esc(p.ram)+&#x27;&lt;/p&gt;&lt;p&gt;&#x27;+esc(p.disk)+&#x27;&lt;/p&gt;&lt;p class=&quot;note&quot;&gt;任务进程树、系统与文件缓存合并验内存；权重、解压和留存产物合并验盘。实际峰值及吞吐：待测。&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+ }
+ html+=&#x27;&lt;p&gt;&lt;strong&gt;配置依据：&lt;/strong&gt;&#x27;+esc(p.basis)+&#x27;&lt;/p&gt;&lt;p class=&quot;note&quot;&gt;待验收：依赖／驱动与自定义内核、固定输入规模、完整筛选路径、实际分卡、逐卡显存、整机或逐机内存、磁盘峰值、取消与恢复。&#x27;+(p.blackwell?&#x27;Blackwell 还需验证 PXDesign 的旧 PyTorch／JAX／CUDA 扩展；平台支持不等于模型已跑通。&#x27;:&#x27;&#x27;)+&#x27;&lt;/p&gt;&#x27;;
+ $(&#x27;#pc-plan-result&#x27;).innerHTML=html;
+}
 const bounds={aCpu:[1,64],bCpu:[1,64],cCpu:[1,64],bVram:[1,192],cVram:[1,192],aRam:[1,512],bRam:[1,512],cRam:[1,512],existing:[0,10000],package:[0,10000],unpack:[0,20000],cSaved:[0,40]};
 const controls={gpu:&#x27;pc-gpu&#x27;,cpu:&#x27;pc-cpu&#x27;,ram:&#x27;pc-ram&#x27;,disk:&#x27;pc-disk&#x27;,load:&#x27;pc-load&#x27;,event:&#x27;pc-event&#x27;,aCpu:&#x27;pc-a-cpu&#x27;,bCpu:&#x27;pc-b-cpu&#x27;,cCpu:&#x27;pc-c-cpu&#x27;,bVram:&#x27;pc-b-vram&#x27;,cVram:&#x27;pc-c-vram&#x27;,aRam:&#x27;pc-a-ram&#x27;,bRam:&#x27;pc-b-ram&#x27;,cRam:&#x27;pc-c-ram&#x27;,existing:&#x27;pc-existing&#x27;,package:&#x27;pc-package&#x27;,unpack:&#x27;pc-unpack&#x27;,cSaved:&#x27;pc-c-saved&#x27;};
-function restore(saved){const m=saved&amp;&amp;saved.modelContent,p=saved&amp;&amp;saved.privateContent;if(!m||m.visualization!==&#x27;protenix-product-concurrency&#x27;||m.revision!==4)return;if(Object.hasOwn(choices,m.gpu))state.gpu=m.gpu;if([16,32,64].includes(m.cpu))state.cpu=m.cpu;if([128,256,512].includes(m.ram))state.ram=m.ram;if([&#x27;single&#x27;,&#x27;split&#x27;].includes(m.disk))state.disk=m.disk;if([&#x27;normal&#x27;,&#x27;prepare&#x27;,&#x27;busy&#x27;,&#x27;low&#x27;].includes(m.load))state.load=m.load;if(events.includes(m.event))state.event=m.event;for(const[k,[lo,hi]]of Object.entries(bounds))if(Number.isFinite(m[k])&amp;&amp;m[k]&gt;=lo&amp;&amp;m[k]&lt;=hi)state[k]=Math.round(m[k]);if(p&amp;&amp;Object.hasOwn(defs,p.selected))state.selected=p.selected;}
+function restore(saved){const m=saved&amp;&amp;saved.modelContent,p=saved&amp;&amp;saved.privateContent;if(!m||m.visualization!==&#x27;protenix-product-concurrency&#x27;||m.revision!==5)return;if(Object.hasOwn(profiles,m.plan))state.plan=m.plan;if(relations.includes(m.relation))state.relation=m.relation;if(gates.includes(m.gate))state.gate=m.gate;if(Object.hasOwn(choices,m.gpu))state.gpu=m.gpu;if([16,32,64].includes(m.cpu))state.cpu=m.cpu;if([128,256,512,1024].includes(m.ram))state.ram=m.ram;if([&#x27;single&#x27;,&#x27;split&#x27;].includes(m.disk))state.disk=m.disk;if([&#x27;normal&#x27;,&#x27;prepare&#x27;,&#x27;busy&#x27;,&#x27;low&#x27;].includes(m.load))state.load=m.load;if(events.includes(m.event))state.event=m.event;for(const[k,[lo,hi]]of Object.entries(bounds))if(Number.isFinite(m[k])&amp;&amp;m[k]&gt;=lo&amp;&amp;m[k]&lt;=hi)state[k]=Math.round(m[k]);if(p&amp;&amp;Object.hasOwn(defs,p.selected))state.selected=p.selected;}
 const active=t=&gt;[&#x27;cpu&#x27;,&#x27;gpu&#x27;,&#x27;stopping&#x27;].includes(t.kind);
 function derive(event=state.event,gpuKey=state.gpu){
  const cards=choices[gpuKey].map((gb,id)=&gt;({gb,id,owner:null})),cap=state.disk===&#x27;single&#x27;?2000:4000,reserve=state.disk===&#x27;single&#x27;?100:200;
@@ -2017,11 +2063,11 @@ function derive(event=state.event,gpuKey=state.gpu){
  }
  Object.assign(tasks.F,{kind:&#x27;done&#x27;,status:&#x27;结果可用&#x27;,reason:&#x27;读取已有文件；开销计入系统／结果服务预算&#x27;});
  const bFinished=event===&#x27;b_finished&#x27;||(cards.length===1&amp;&amp;event.startsWith(&#x27;c_&#x27;)&amp;&amp;derive(&#x27;normal&#x27;,gpuKey).byId.B.kind===&#x27;gpu&#x27;);
- if(bFinished){admit(&#x27;B&#x27;,8,20,4,0);if(tasks.B.kind===&#x27;cpu&#x27;){tasks.B.status=&#x27;整理中&#x27;;tasks.B.reason=&#x27;预测进程退出已确认，GPU 已释放；继续核验结果&#x27;;}}else admit(&#x27;B&#x27;,state.bRam,10,state.bCpu,state.bVram,0);
+ if(bFinished){admit(&#x27;B&#x27;,8,20,4,0);if(tasks.B.kind===&#x27;cpu&#x27;){tasks.B.status=&#x27;整理中&#x27;;tasks.B.reason=&#x27;预测进程退出已确认，GPU 已释放；继续核验结果&#x27;;}}else admit(&#x27;B&#x27;,state.bRam,10,state.bCpu,state.bVram,cards.length&gt;1?1:0);
  admit(&#x27;D&#x27;,8,20,4,0);const prep=state.load===&#x27;prepare&#x27;;admit(&#x27;A&#x27;,prep?Math.max(state.aRam,64):state.aRam,prep?state.package+state.unpack+50:40,state.aCpu,0);
- if(!released){admit(&#x27;C&#x27;,state.cRam,40,state.cCpu,state.cVram,cards.length&gt;1?1:0);if(event===&#x27;c_cancel_requested&#x27;&amp;&amp;tasks.C.kind===&#x27;gpu&#x27;){tasks.C.kind=&#x27;stopping&#x27;;tasks.C.status=&#x27;取消处理中&#x27;;tasks.C.reason=&#x27;父子进程未退出，GPU、CPU 和内存预算仍保留&#x27;;tasks.C.next=&#x27;确认进程退出与资源释放后才启动下一任务&#x27;;}}else Object.assign(tasks.C,{kind:event===&#x27;c_failed&#x27;?&#x27;failed&#x27;:event===&#x27;c_retry&#x27;?&#x27;wait&#x27;:event===&#x27;c_zero&#x27;?&#x27;done&#x27;:&#x27;cancelled&#x27;,status:event===&#x27;c_failed&#x27;?&#x27;失败&#x27;:event===&#x27;c_retry&#x27;?&#x27;重执行排队&#x27;:event===&#x27;c_zero&#x27;?&#x27;完成·零候选&#x27;:&#x27;已取消&#x27;,reason:&#x27;进程退出已确认，已保存文件保留&#x27;});
+ if(!released){admit(&#x27;C&#x27;,state.cRam,40,state.cCpu,state.cVram,0);if(event===&#x27;c_cancel_requested&#x27;&amp;&amp;tasks.C.kind===&#x27;gpu&#x27;){tasks.C.kind=&#x27;stopping&#x27;;tasks.C.status=&#x27;取消处理中&#x27;;tasks.C.reason=&#x27;父子进程未退出，GPU、CPU 和内存预算仍保留&#x27;;tasks.C.next=&#x27;确认进程退出与资源释放后才启动下一任务&#x27;;}}else Object.assign(tasks.C,{kind:event===&#x27;c_failed&#x27;?&#x27;failed&#x27;:event===&#x27;c_retry&#x27;?&#x27;wait&#x27;:event===&#x27;c_zero&#x27;?&#x27;done&#x27;:&#x27;cancelled&#x27;,status:event===&#x27;c_failed&#x27;?&#x27;失败&#x27;:event===&#x27;c_retry&#x27;?&#x27;重执行排队&#x27;:event===&#x27;c_zero&#x27;?&#x27;完成·零候选&#x27;:&#x27;已取消&#x27;,reason:&#x27;进程退出已确认，已保存文件保留&#x27;});
  admit(&#x27;E&#x27;,state.bRam,10,state.bCpu,state.bVram);
- if(event===&#x27;c_retry&#x27;){admit(&#x27;C&#x27;,state.cRam,40,state.cCpu,state.cVram,cards.length&gt;1?1:0);tasks.C.reason=&#x27;第 2 次尝试；第 1 次错误和文件保留。&#x27;+tasks.C.reason;}
+ if(event===&#x27;c_retry&#x27;){admit(&#x27;C&#x27;,state.cRam,40,state.cCpu,state.cVram,0);tasks.C.reason=&#x27;第 2 次尝试；第 1 次错误和文件保留。&#x27;+tasks.C.reason;}
  if(event===&#x27;c_cancel_done&#x27;)tasks.C.next=&#x27;查看取消记录和已存文件；需要时发起新的尝试&#x27;;
  if(event===&#x27;c_failed&#x27;)tasks.C.next=&#x27;查看错误及日志，调整配置后重试&#x27;;
  if(event===&#x27;c_zero&#x27;)tasks.C.next=&#x27;查看筛选记录，由科学人员判断是否调整设计条件&#x27;;
@@ -2035,7 +2081,7 @@ function resolveScenario(event=state.event){
   return{view:derive(event),valid:true,note:&#x27;假设 B 已结束计算并让卡，继续用 CPU 整理结果。C 有自己的输入，可申请该卡，不依赖 B 此次输出。&#x27;};
  }
  const started=derive(&#x27;c_running&#x27;);
- const premise=single?(normal.byId.B.kind===&#x27;gpu&#x27;?&#x27;本例先假设 B 已结束并让卡，再由 C 运行。&#x27;:&#x27;B 当前未运行，C 独立申请本卡。&#x27;):&#x27;C 固定使用 GPU 1，B 使用 GPU 0；运行中的任务不迁卡。&#x27;;
+ const premise=single?(normal.byId.B.kind===&#x27;gpu&#x27;?&#x27;本例先假设 B 已结束并让卡，再由 C 运行。&#x27;:&#x27;B 当前未运行，C 独立申请本卡。&#x27;):&#x27;C 固定使用物理 GPU 0，B 使用物理 GPU 1；运行中的任务不迁卡。&#x27;;
  if(started.byId.C.kind!==&#x27;gpu&#x27;)return{view:started,valid:false,note:&#x27;此场景需 C 先开始计算。&#x27;+premise+&#x27;当前 C &#x27;+started.byId.C.status+&#x27;：&#x27;+started.byId.C.reason+&#x27; 不能模拟尚未发生的取消、失败或完成。&#x27;};
  const meanings={c_cancel_requested:&#x27;C 取消中，进程尚未退出，资源仍保留。&#x27;,c_cancel_done:&#x27;C 已退出并确认清理，计算资源释放，文件保留。&#x27;,c_failed:&#x27;C 本次失败，进程退出与清理已确认，错误和文件保留。&#x27;,c_retry:&#x27;C 第 1 次失败并退出，第 2 次重新申请资源。&#x27;,c_zero:&#x27;C 已完成计算，但没有候选通过；交付筛选记录。&#x27;};
  return{view:derive(event),valid:true,note:premise+meanings[event]};
@@ -2044,6 +2090,7 @@ const tag=k=&gt;[&#x27;wait&#x27;,&#x27;blocked&#x27;,&#x27;stopping&#x27;].incl
 function meter(label,total,parts){return &#x27;&lt;div class=&quot;meter&quot; role=&quot;img&quot; aria-label=&quot;&#x27;+esc(label)+&#x27;&quot;&gt;&#x27;+parts.map(([n,c])=&gt;&#x27;&lt;span class=&quot;&#x27;+c+&#x27;&quot; style=&quot;width:&#x27;+Math.max(0,Math.min(100,n/total*100))+&#x27;%&quot;&gt;&lt;/span&gt;&#x27;).join(&#x27;&#x27;)+&#x27;&lt;/div&gt;&#x27;;}
 function demand(t){return t.cpu+&#x27; 核／内存 &#x27;+t.ram+&#x27; GB／显存 &#x27;+t.vram+&#x27; GB／新增写盘预留 &#x27;+t.write+&#x27; GB&#x27;;}
 function render(save=false){
+ renderPlan();
  const scenario=resolveScenario(),v=scenario.view;
  for(const[k,id]of Object.entries(controls))$(&#x27;#&#x27;+id).value=state[k];
  for(const o of $(&#x27;#pc-event&#x27;).options){if(!o.dataset.label)o.dataset.label=o.textContent;const r=resolveScenario(o.value);o.disabled=!r.valid;o.textContent=o.dataset.label+(r.valid?&#x27;&#x27;:&#x27;（前提未满足）&#x27;);}
@@ -2056,12 +2103,14 @@ function render(save=false){
  $(&#x27;#pc-tasks&#x27;).innerHTML=v.tasks.map(t=&gt;&#x27;&lt;div class=&quot;task &#x27;+([&#x27;wait&#x27;,&#x27;blocked&#x27;].includes(t.kind)?&#x27;unavailable &#x27;:&#x27;&#x27;)+(t.id===state.selected?&#x27;selected&#x27;:&#x27;&#x27;)+&#x27;&quot; data-task-row=&quot;&#x27;+t.id+&#x27;&quot;&gt;&lt;div&gt;&lt;div class=&quot;name&quot;&gt;&#x27;+t.id+&#x27; · &#x27;+esc(t.title)+&#x27;&lt;/div&gt;&lt;div class=&quot;note&quot;&gt;&#x27;+esc(t.tool)+&#x27;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;task-content&quot;&gt;&lt;span class=&quot;tag &#x27;+tag(t.kind)+&#x27;&quot;&gt;&#x27;+esc(t.status)+&#x27;&lt;/span&gt;&#x27;+esc(t.reason)+&#x27;&lt;div class=&quot;note&quot;&gt;&#x27;+(t.id===&#x27;F&#x27;?&#x27;开销已计入系统服务&#x27;:t.ram?(active(t)?&#x27;假设分配：&#x27;:&#x27;假设需求（模拟占用 0）：&#x27;)+esc(demand(t))+(t.card!==null?&#x27;；GPU &#x27;+t.card:&#x27;&#x27;):&#x27;计算资源 0；已存文件仍占盘&#x27;)+&#x27;&lt;/div&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; data-task=&quot;&#x27;+t.id+&#x27;&quot; aria-label=&quot;查看任务&#x27;+t.id+&#x27;详情&quot;&gt;详情&lt;/button&gt;&lt;/div&gt;&#x27;).join(&#x27;&#x27;);
  const free=Math.max(0,state.ram-36-v.ram),diskFree=Math.max(0,v.cap-v.existing-v.write-v.reserve);
  $(&#x27;#pc-resources&#x27;).innerHTML=v.cards.map(c=&gt;{const t=c.owner?v.byId[c.owner]:null;return &#x27;&lt;div class=&quot;resource&quot;&gt;&lt;div class=&quot;resource-head&quot;&gt;&lt;span&gt;GPU &#x27;+c.id+&#x27;&lt;/span&gt;&lt;span&gt;&#x27;+c.gb+&#x27; GB 单卡&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;owner&quot;&gt;&#x27;+(t?t.id+&#x27; · &#x27;+esc(t.tool):&#x27;空闲；其他资源或任务未就绪&#x27;)+&#x27;&lt;/div&gt;&#x27;+meter(&#x27;显存预算&#x27;,c.gb,[[t?t.vram:0,&#x27;jobs&#x27;],[4,&#x27;reserve&#x27;]])+&#x27;&lt;div class=&quot;note&quot;&gt;任务 &#x27;+(t?t.vram:0)+&#x27;＋保留 4；未分配 &#x27;+(c.gb-4-(t?t.vram:0))+&#x27; GB&lt;/div&gt;&lt;p class=&quot;note&quot;&gt;预算不是显存实测；剩余显存不自动再放第二个重任务。&lt;/p&gt;&lt;/div&gt;&#x27;;}).join(&#x27;&#x27;)+&#x27;&lt;div class=&quot;resource&quot;&gt;&lt;div class=&quot;resource-head&quot;&gt;&lt;span&gt;CPU&lt;/span&gt;&lt;span&gt;&#x27;+state.cpu+&#x27; 物理核&lt;/span&gt;&lt;/div&gt;&#x27;+meter(&#x27;CPU 核预算&#x27;,state.cpu,[[4,&#x27;base&#x27;],[v.cpu,&#x27;jobs&#x27;]])+&#x27;&lt;p&gt;服务保留 4 · 任务 &#x27;+v.cpu+&#x27; · 未分配 &#x27;+(state.cpu-4-v.cpu)+&#x27; 核&lt;/p&gt;&lt;div class=&quot;note&quot;&gt;是核数预算，不是 CPU 利用率实测。&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;resource&quot;&gt;&lt;div class=&quot;resource-head&quot;&gt;&lt;span&gt;整机内存&lt;/span&gt;&lt;span&gt;&#x27;+state.ram+&#x27; GB&lt;/span&gt;&lt;/div&gt;&#x27;+meter(&#x27;内存预算&#x27;,state.ram,[[20,&#x27;base&#x27;],[v.ram,&#x27;jobs&#x27;],[16,&#x27;reserve&#x27;]])+&#x27;&lt;div class=&quot;note&quot;&gt;系统／服务 20 · 任务 &#x27;+v.ram+&#x27; · 安全 16 GB&lt;/div&gt;&lt;p&gt;未分配 &#x27;+free+&#x27; GB，可供空闲／可回收文件缓存。&lt;/p&gt;&lt;div class=&quot;note&quot;&gt;预算非实测；Linux 可用内存看 MemAvailable。&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;resource&quot;&gt;&lt;div class=&quot;resource-head&quot;&gt;&lt;span&gt;&#x27;+(state.disk===&#x27;split&#x27;?&#x27;4 TB 数据盘&#x27;:&#x27;2 TB 单盘&#x27;)+&#x27;&lt;/span&gt;&lt;span&gt;预算 GB&lt;/span&gt;&lt;/div&gt;&#x27;+meter(&#x27;磁盘预算&#x27;,v.cap,[[v.existing,&#x27;base&#x27;],[v.write,&#x27;jobs&#x27;],[v.reserve,&#x27;reserve&#x27;]])+&#x27;&lt;div class=&quot;note&quot;&gt;已有 &#x27;+v.existing+&#x27; · 新写预留 &#x27;+v.write+&#x27; · 安全 &#x27;+v.reserve+&#x27;&lt;/div&gt;&lt;p&gt;未分配 &#x27;+diskFree+&#x27; GB&#x27;+(v.existing&gt;v.cap?&#x27;（已有文件已超容量）&#x27;:&#x27;&#x27;)+&#x27;&lt;/p&gt;&lt;div class=&quot;note&quot;&gt;&#x27;+(state.disk===&#x27;split&#x27;?&#x27;另有独立 2 TB 系统盘，不合并计入。&#x27;:&#x27;系统和数据共用此物理盘。&#x27;)+&#x27; 容量与读写延迟分别验收。&lt;/div&gt;&lt;/div&gt;&#x27;;
- $(&#x27;#pc-compare&#x27;).innerHTML=Object.keys(choices).map(k=&gt;{const w=derive(&#x27;normal&#x27;,k),b=w.byId.B,c=w.byId.C,ok=b.kind===&#x27;gpu&#x27;&amp;&amp;c.kind===&#x27;gpu&#x27;;return &#x27;&lt;tr class=&quot;&#x27;+(ok?&#x27;ready-row&#x27;:&#x27;unavailable-row&#x27;)+&#x27;&quot;&gt;&lt;td&gt;&#x27;+esc(names[k])+(k===state.gpu?&#x27;（当前）&#x27;:&#x27;&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+(ok?&#x27;假设内可分配&#x27;:[b.kind,c.kind].includes(&#x27;blocked&#x27;)?&#x27;当前假设不满足&#x27;:choices[k].length===1?&#x27;按本页策略排队&#x27;:&#x27;当前预算不能并行&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(ok?&#x27;B → GPU 0：&#x27;+b.vram+&#x27; GB 显存／&#x27;+b.ram+&#x27; GB 内存；C → GPU 1：&#x27;+c.vram+&#x27; GB 显存／&#x27;+c.ram+&#x27; GB 内存。整机合计任务 &#x27;+w.cpu+&#x27; 核／&#x27;+w.ram+&#x27; GB 内存（含当前已放行的其他任务）。&#x27;:&#x27;B：&#x27;+b.status+(b.kind===&#x27;gpu&#x27;?&#x27;&#x27;:&#x27;，&#x27;+b.reason)+&#x27;；C：&#x27;+c.status+(c.kind===&#x27;gpu&#x27;?&#x27;&#x27;:&#x27;，&#x27;+c.reason))+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;}).join(&#x27;&#x27;);
+ $(&#x27;#pc-compare&#x27;).innerHTML=Object.keys(choices).map(k=&gt;{const w=derive(&#x27;normal&#x27;,k),b=w.byId.B,c=w.byId.C,ok=b.kind===&#x27;gpu&#x27;&amp;&amp;c.kind===&#x27;gpu&#x27;;return &#x27;&lt;tr class=&quot;&#x27;+(ok?&#x27;ready-row&#x27;:&#x27;unavailable-row&#x27;)+&#x27;&quot;&gt;&lt;td&gt;&#x27;+esc(names[k])+(k===state.gpu?&#x27;（当前）&#x27;:&#x27;&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+(ok?&#x27;假设内可分配&#x27;:[b.kind,c.kind].includes(&#x27;blocked&#x27;)?&#x27;当前假设不满足&#x27;:choices[k].length===1?&#x27;按本页策略排队&#x27;:&#x27;当前预算不能并行&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(ok?&#x27;B → GPU &#x27;+b.card+&#x27;：&#x27;+b.vram+&#x27; GB 显存／&#x27;+b.ram+&#x27; GB 内存；C → GPU &#x27;+c.card+&#x27;：&#x27;+c.vram+&#x27; GB 显存／&#x27;+c.ram+&#x27; GB 内存。整机合计任务 &#x27;+w.cpu+&#x27; 核／&#x27;+w.ram+&#x27; GB 内存（含当前已放行的其他任务）。&#x27;:&#x27;B：&#x27;+b.status+(b.kind===&#x27;gpu&#x27;?&#x27;&#x27;:&#x27;，&#x27;+b.reason)+&#x27;；C：&#x27;+c.status+(c.kind===&#x27;gpu&#x27;?&#x27;&#x27;:&#x27;，&#x27;+c.reason))+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;}).join(&#x27;&#x27;);
  const t=v.byId[state.selected],zero=scenario.valid&amp;&amp;t.id===&#x27;C&#x27;&amp;&amp;state.event===&#x27;c_zero&#x27;;
  $(&#x27;#pc-detail&#x27;).innerHTML=&#x27;&lt;h3&gt;&#x27;+t.id+&#x27; · &#x27;+esc(t.title)+&#x27; &lt;span class=&quot;tag &#x27;+tag(t.kind)+&#x27;&quot;&gt;&#x27;+esc(t.status)+&#x27;&lt;/span&gt;&lt;/h3&gt;&lt;div class=&quot;detail-grid&quot;&gt;&lt;div&gt;&lt;strong&gt;输入&lt;/strong&gt;&#x27;+esc(t.input)+&#x27;&lt;/div&gt;&lt;div&gt;&lt;strong&gt;&#x27;+(zero?&#x27;本次结果&#x27;:&#x27;预期交付&#x27;)+&#x27;&lt;/strong&gt;&#x27;+esc(zero?&#x27;无候选通过；交付筛选记录与零候选说明&#x27;:t.output)+&#x27;&lt;/div&gt;&lt;div&gt;&lt;strong&gt;&#x27;+(active(t)?&#x27;已分配预算&#x27;:&#x27;计划需求与当前占用&#x27;)+&#x27;&lt;/strong&gt;&#x27;+esc(t.ram?demand(t)+(active(t)?&#x27;；当前使用 GPU &#x27;+(t.card===null?&#x27;无&#x27;:t.card):&#x27;；尚未启动，计算资源 0&#x27;):&#x27;计算资源已释放／计入服务，文件保留&#x27;)+&#x27;&lt;/div&gt;&lt;div&gt;&lt;strong&gt;当前原因／下一步&lt;/strong&gt;&#x27;+esc([&#x27;wait&#x27;,&#x27;blocked&#x27;].includes(t.kind)?t.reason:t.next)+&#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
  root.querySelectorAll(&#x27;[data-task]&#x27;).forEach(b=&gt;b.addEventListener(&#x27;click&#x27;,()=&gt;{state.selected=b.dataset.task;render(true);}));
- if(save&amp;&amp;window.openai&amp;&amp;typeof window.openai.setWidgetState===&#x27;function&#x27;){const{selected,...model}=state;window.openai.setWidgetState({modelContent:{visualization:&#x27;protenix-product-concurrency&#x27;,revision:4,...model},privateContent:{selected}}).catch(()=&gt;{});}
+ if(save&amp;&amp;window.openai&amp;&amp;typeof window.openai.setWidgetState===&#x27;function&#x27;){const{selected,...model}=state;window.openai.setWidgetState({modelContent:{visualization:&#x27;protenix-product-concurrency&#x27;,revision:5,...model},privateContent:{selected}}).catch(()=&gt;{});}
 }
+for(const [key,id]of [[&#x27;plan&#x27;,&#x27;pc-plan&#x27;],[&#x27;relation&#x27;,&#x27;pc-relation&#x27;],[&#x27;gate&#x27;,&#x27;pc-gate&#x27;]])$(&#x27;#&#x27;+id).addEventListener(&#x27;change&#x27;,e=&gt;{state[key]=e.target.value;render(true);});
+root.querySelectorAll(&#x27;.quick-links a&#x27;).forEach(link=&gt;link.addEventListener(&#x27;click&#x27;,e=&gt;{const target=$(link.getAttribute(&#x27;href&#x27;));if(!target)return;e.preventDefault();if(target.tagName===&#x27;DETAILS&#x27;)target.open=true;target.scrollIntoView({block:&#x27;start&#x27;,behavior:&#x27;instant&#x27;});}));
 for(const[k,id]of Object.entries(controls))$(&#x27;#&#x27;+id).addEventListener(&#x27;change&#x27;,e=&gt;{if(Object.hasOwn(bounds,k)){const n=Number(e.target.value),[lo,hi]=bounds[k];if(e.target.value===&#x27;&#x27;||!Number.isFinite(n)||n&lt;lo||n&gt;hi){e.target.value=state[k];return;}state[k]=Math.round(n);}else state[k]=[&#x27;cpu&#x27;,&#x27;ram&#x27;].includes(k)?Number(e.target.value):e.target.value;if(k===&#x27;event&#x27;)state.selected=state.event.startsWith(&#x27;c_&#x27;)?&#x27;C&#x27;:&#x27;B&#x27;;render(true);});
 restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEventListener(&#x27;openai:set_globals&#x27;,e=&gt;{restore(e.detail&amp;&amp;e.detail.globals&amp;&amp;e.detail.globals.widgetState);render();});
 })();
@@ -2663,11 +2712,19 @@ restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEve
   if (!(frame instanceof HTMLIFrameElement)) {
     return;
   }
+  const isShare = document.documentElement.classList.contains(
+    "visualization-share-root",
+  );
   let viewportHeight = globalThis.innerHeight;
+  let sizeFingerprint = null;
+  let sizeWriteTimeout;
+  let lastSize = null;
+  let pendingSize = null;
   const storageKey = `codex:visualization-widget-state-v2:${JSON.stringify([
     globalThis.location.pathname,
     globalThis.location.search,
   ])}`;
+  const sizeStorageKey = `${storageKey}:share-size-v1`;
   const parseState = (serializedState) => {
     if (
       typeof serializedState !== "string" ||
@@ -2724,6 +2781,21 @@ restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEve
   } catch {
     storage = null;
   }
+  const persistSize = () => {
+    globalThis.clearTimeout(sizeWriteTimeout);
+    if (pendingSize == null) {
+      return;
+    }
+    try {
+      storage?.setItem(sizeStorageKey, pendingSize);
+    } catch {
+      // A denied or full cache must not affect the visualization.
+    }
+    pendingSize = null;
+  };
+  if (isShare) {
+    globalThis.addEventListener("pagehide", persistSize);
+  }
   const initialGlobals = {
     widgetState: state,
     statePersistence: storage == null ? "none" : "local",
@@ -2759,12 +2831,39 @@ restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEve
     if (data.type === "height") {
       const height = data.height;
       if (
-        typeof height === "number" &&
-        Number.isFinite(height) &&
-        height >= 0 &&
-        height <= 10_000
+        typeof height !== "number" ||
+        !Number.isFinite(height) ||
+        height < 0
       ) {
+        return;
+      }
+      if (height <= 10_000) {
+        const width = isShare && storage != null ? frame.clientWidth : null;
         frame.style.height = Math.ceil(height) + "px";
+        if (isShare && storage != null) {
+          const size = JSON.stringify({
+            fingerprint: sizeFingerprint,
+            width,
+            viewportHeight: globalThis.innerHeight,
+            dark: globalThis.matchMedia("(prefers-color-scheme: dark)").matches,
+            scale: globalThis.devicePixelRatio,
+            height: Math.ceil(height),
+          });
+          if (size !== lastSize) {
+            lastSize = size;
+            pendingSize = size;
+            globalThis.clearTimeout(sizeWriteTimeout);
+            sizeWriteTimeout = globalThis.setTimeout(persistSize, 100);
+          }
+        }
+      }
+      if (isShare) {
+        // Keep unusually tall content accessible without accepting an unbounded height.
+        if (height > 10_000 && Number.parseFloat(frame.style.height) === 0) {
+          frame.style.removeProperty("height");
+        }
+        frame.scrolling = height > 10_000 ? "auto" : "no";
+        document.documentElement.classList.add("visualization-share-ready");
       }
       return;
     }
@@ -2829,7 +2928,7 @@ restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEve
   }
   globalThis.addEventListener("resize", () => {
     const height = Number.parseFloat(frame.style.height);
-    if (!Number.isFinite(height) || height <= viewportHeight) {
+    if (!isShare && (!Number.isFinite(height) || height <= viewportHeight)) {
       frame.style.removeProperty("height");
     }
     viewportHeight = globalThis.innerHeight;
@@ -2847,13 +2946,42 @@ restore(window.openai&amp;&amp;window.openai.widgetState);render();window.addEve
     { once: true },
   );
   // Match the trusted bootstrap element, not the same text in an authored title.
-  frame.srcdoc = srcdoc.replace(
+  const frameHtml = srcdoc.replace(
     '<script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__<\/script>',
     () =>
       '<script type="application/json" id="codex-visualization-widget-state">' +
       JSON.stringify(initialGlobals).replaceAll("<", "\\u003c") +
       "<\/script>",
   );
+  if (isShare && storage != null) {
+    // Fingerprint the rendered document, including restored widget state, without
+    // storing its content. This is a layout cache, not a security identity.
+    let hash = 5381;
+    for (let index = 0; index < frameHtml.length; index += 1) {
+      hash = (hash * 33 + frameHtml.charCodeAt(index)) % 4_294_967_296;
+    }
+    sizeFingerprint = hash.toString(36);
+    try {
+      const size = JSON.parse(storage.getItem(sizeStorageKey) ?? "null");
+      if (
+        size?.fingerprint === sizeFingerprint &&
+        size.width === frame.clientWidth &&
+        size.viewportHeight === globalThis.innerHeight &&
+        size.dark ===
+          globalThis.matchMedia("(prefers-color-scheme: dark)").matches &&
+        size.scale === globalThis.devicePixelRatio &&
+        typeof size.height === "number" &&
+        Number.isFinite(size.height) &&
+        size.height >= 0 &&
+        size.height <= 10_000
+      ) {
+        frame.style.height = size.height + "px";
+      }
+    } catch {
+      // Ignore missing or invalid cache entries and measure the live frame.
+    }
+  }
+  frame.srcdoc = frameHtml;
   delete frame.dataset.srcdoc;
 })();
 </script>
