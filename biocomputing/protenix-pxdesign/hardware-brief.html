@@ -1,8 +1,8 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Protenix 三档硬件汇报稿</title><style>
 :root{color-scheme:light dark}body{max-width:1050px;margin:30px auto;padding:0 18px;font:15px/1.8 system-ui;color:light-dark(#202c3c,#e5edf7);background:light-dark(#fff,#151b23)}h1{font-size:23px}a{color:light-dark(#235cb8,#9ac0ff)}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;vertical-align:top;padding:10px 7px;border-bottom:1px solid light-dark(#dce3ed,#354355)}blockquote{margin:12px 0;padding:10px 16px;background:light-dark(#f4f6fa,#202a37)}@media(max-width:650px){table{display:block;overflow-x:auto}th,td{min-width:115px}h1{font-size:20px}}
 </style></head><body><h1>Protenix＋PXDesign 研发硬件询租单</h1>
-<p>2026-10-18 · <a href="../../index.html">阅读入口</a> · <a href="runtime-hardware.html">选型工具</a></p>
-<p><strong>建议选二档：单 RTX PRO 6000 Blackwell 96 GB，先短租，用于研发调试和小批量内测。只有硬要求两任务各有一张卡，才选三档。</strong></p>
+<p>2026-10-18 · <a href="../../index.html">阅读入口</a> · <a href="runtime-hardware.html">选型工具</a> · <a href="hardware-reference.html">配置依据</a></p>
+<p><strong>二档单 RTX PRO 6000 Blackwell 96 GB 作为优先短租候选，用于研发调试和小批量内测。三档提供两张独立 GPU。</strong></p>
 <table>
 <thead>
 <tr>
@@ -21,14 +21,14 @@
 <td>单卡 48 GB，输入规模和并发待测。</td>
 </tr>
 <tr>
-<td><strong>二档：推荐</strong></td>
+<td><strong>二档：优先试租</strong></td>
 <td><strong>1×RTX PRO 6000 Blackwell 96 GB</strong></td>
 <td>研发、小批量内测</td>
 <td>单任务显存空间更大。</td>
 <td>可试同卡共享，但两模型并发未实测。</td>
 </tr>
 <tr>
-<td>三档：分卡并发</td>
+<td>三档：双卡分工</td>
 <td>2×RTX 6000 Ada Generation，各 48 GB</td>
 <td>两任务分别用卡</td>
 <td>GPU 可分别分配。</td>
@@ -37,7 +37,7 @@
 </tbody></table>
 <p>三档共同询租目标：<strong>24 vCPU 起、整机 128 GB 内存、可用 2 TB NVMe SSD、Linux 原生部署</strong>。这是工程询价目标，非实测最低值；CPU 型号及实际分配由商家列明。</p>
 <p>一档有货时可另报 <strong>RTX PRO 5000 72GB Blackwell</strong>，单列型号；三档可另报 <strong>2×L20 48 GB</strong> 整机替代方案，物料分开写。</p>
-<p>必要条件：Blackwell 的 PXDesign 旧依赖需适配；三档都要两工具各自完整跑通，再验并发与整机内存，不能凭卡数保证同时完成。</p>
+<p><strong>三档的两项判断均待实测：① 分别正常运行；② 两套同时正常运行。</strong> 都须完整产出结果。PXDesign 的旧依赖在 Blackwell 上需验证兼容性；实际显存、整机内存和耗时以租机结果为准。</p>
 <p>可整段转发采购：</p>
 <blockquote>
 <p>主报 1×RTX PRO 6000 Blackwell 96 GB；备选 1×RTX PRO 5000 Blackwell 48 GB、2×RTX 6000 Ada Generation（各 48 GB）。三档均按 24 vCPU 起、整机 128 GB 内存、可用 2 TB NVMe SSD、Linux 原生环境询租。请注明 GPU 具体版本及整卡独占、CPU 型号与分配、磁盘是否持久保留、NVIDIA 驱动支持，分别报短租／续租及配套存储总价，替代物料单列。</p>

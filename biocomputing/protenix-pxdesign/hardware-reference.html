@@ -1,0 +1,72 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Protenix 官方依据与待测项</title><style>
+:root{color-scheme:light dark}body{max-width:1050px;margin:30px auto;padding:0 18px;font:15px/1.8 system-ui;color:light-dark(#202c3c,#e5edf7);background:light-dark(#fff,#151b23)}h1{font-size:23px}a{color:light-dark(#235cb8,#9ac0ff)}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;vertical-align:top;padding:10px 7px;border-bottom:1px solid light-dark(#dce3ed,#354355)}blockquote{margin:12px 0;padding:10px 16px;background:light-dark(#f4f6fa,#202a37)}@media(max-width:650px){table{display:block;overflow-x:auto}th,td{min-width:115px}h1{font-size:20px}}
+</style></head><body><h1>配置依据与待实测项</h1>
+<p>2026-10-18 · <a href="../../index.html">阅读入口</a> · <a href="hardware-brief.html">三档询租单</a> · <a href="runtime-hardware.html">选型工具</a></p>
+<p><strong>单 PRO 6000 Blackwell 96 GB 是优先短租候选。分别正常运行、两套同时正常运行，这两项都尚未在该配置上实测；现有官方 benchmark 不能代替确认。</strong></p>
+<h2>1. 官方建议和实际 benchmark</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>官方建议</th>
+<th>已公开的实际运行数据</th>
+<th>不能据此确认的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Protenix</td>
+<td>推理默认 BF16；文档的 A100／H20／H100 硬件推荐位于训练部分</td>
+<td>资源表：1,000 token／10,000 原子为 <strong>18.2 GB、59 秒</strong>；2,000 token／20,000 原子为 <strong>66.6 GB、226 秒</strong>。配套耗时图标注 A100-SXM4-80GB、代码 v0.7.0、1 个种子生成 5 个结构</td>
+<td>表沿用旧测试，未明确权重；不能当作当前 v1／v2 或 PRO 6000 实测，也没给整机内存峰值</td>
+</tr>
+<tr>
+<td>PXDesign</td>
+<td>现代 GPU 举例 A100／H100，推荐 BF16 和配套优化</td>
+<td>L20 耗时图：靶点＋设计链共 200 残基，Extended 约 <strong>9 秒／条</strong>；500 残基约 <strong>45 秒／条</strong>。为 512 条设计的平均耗时，数值是读图约值</td>
+<td>图没给显存／内存峰值和明确模型版本；不是 PRO 6000 实测，也不是两套工具同时运行的结果</td>
+</tr>
+</tbody></table>
+<p>Protenix 来源：<a href="https://github.com/bytedance/Protenix/blob/85767b811c40ed46e73a9b39519cf6bfca8701ba/docs/training_inference_instructions.md#inference-cost">资源表</a>、<a href="https://github.com/bytedance/Protenix/blob/85767b811c40ed46e73a9b39519cf6bfca8701ba/assets/inference_time_vs_ntoken.png">测试条件图</a>。</p>
+<p>PXDesign 来源：<a href="https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/README.md#2-running-pxdesign">运行模式与建议</a>、<a href="https://github.com/bytedance/PXDesign/blob/f788441313c84c3074fe9596ac2433f96b15c763/assets/running_time.png">L20 耗时图</a>。Extended 包括序列设计与 AF2／内部 Protenix 筛选；不能只测生成器。</p>
+<h2>2. 租机后只确认两件事</h2>
+<table>
+<thead>
+<tr>
+<th>判断</th>
+<th>怎样算通过</th>
+<th>单 PRO 6000 96 GB 当前状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>分别正常运行</strong></td>
+<td>两工具各自完整完成任务，产出可检查的真实结果</td>
+<td>未实测；含 PXDesign 旧依赖在 Blackwell 上的兼容性</td>
+</tr>
+<tr>
+<td><strong>两套同时正常运行</strong></td>
+<td>两套各有输入已就绪的任务，同时推进，最终都完整完成并产出结果</td>
+<td>未实测；需要记录合计显存、整机内存及耗时</td>
+</tr>
+</tbody></table>
+<p>起测任务固定如下；这些是计划输入，不是上面 benchmark 的测试条件。</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>固定版本与输入</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>独立 Protenix</td>
+<td>源码 <code>85767b8</code>；权重 <code>protenix_base_default_v1.0.0</code>；官方 693 残基蛋白样例，预计算 MSA、无模板；显式 1 个种子、5 个结构</td>
+</tr>
+<tr>
+<td>PXDesign</td>
+<td>源码 <code>f788441</code>；生成权重 <code>pxdesign_v0.1.0</code>；PD-L1 目标 116＋设计链 80 残基，预计算 MSA；显式 <code>N_sample=10</code>、<code>extended</code>；内部 Protenix 用其配套版本</td>
+</tr>
+</tbody></table>
+<p>一张卡不强制串行；是否能同时正常运行取决于兼容性和合计占用。两张 48 GB 也不能让一个任务获得 96 GB。任务总数不等于同一时刻放入显存的候选数，同一目标尚未产生的结构不能提前交给设计任务。</p>
+<h2>3. 租前核对</h2>
+<p>确认 GPU 完整型号、版本、整卡使用权限；CPU 型号及实际分配；整机可用内存；可用磁盘及持久保留条件；Linux／驱动安装权限和数据下载网络。PRO 6000 的 Workstation、Max-Q、Server 版本分别注明。</p>
+<p>24 vCPU、128 GB 内存、可用 2 TB NVMe 是本次询价目标，<strong>不是官方最低要求，也没有实测容量背书</strong>。先用所选权重、CCD 和预计算 MSA，不下载全量训练集或自建全库搜索。</p>
+</body></html>
